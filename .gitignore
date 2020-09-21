@@ -1,7 +1,7 @@
 # This .gitignore file should be placed at the root of your Unity project directory
 
 # *******Lighting Data for each scene ************
-Assets/Scenes/main/
+Assets/Scenes/TestLevel/
 
 /[Ll]ibrary/
 /[Tt]emp/
