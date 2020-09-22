@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayeMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     public float movementSpeed = 8.0f;
+    public float sprintIncrease = 1.5f;
+    public float crouchDecrease = 0.75f;
     public float jumpVelocity = 20.0f;
     public float gravity = 10.0f;
     public float jumpThreshold = 0.11f;
@@ -12,6 +14,7 @@ public class PlayeMovement : MonoBehaviour
     CharacterController controller;
     Vector3 movementVector = Vector3.zero;
     float y = 0;
+    public bool isCrouching = false;
 
 
     private bool canJump()
@@ -36,10 +39,29 @@ public class PlayeMovement : MonoBehaviour
 
     private void Update()
     {
-        movementVector = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        float speedModifier = 1;
+
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+        movementVector = new Vector3(horizontal, 0, vertical);
         movementVector = transform.TransformDirection(movementVector);
         movementVector = movementVector.normalized;
-        controller.Move(movementVector * movementSpeed * Time.deltaTime);
+
+        if (Input.GetKeyDown(KeyCode.C)) isCrouching = !isCrouching;
+
+        if (isCrouching)
+        {
+            speedModifier *= crouchDecrease;
+        }
+        else
+        {
+            if (Input.GetKey(KeyCode.LeftShift) && vertical > 0)
+            {
+                speedModifier = sprintIncrease;
+            }
+        }
+
+        controller.Move(movementVector * (movementSpeed * speedModifier) * Time.deltaTime);
 
         if (controller.isGrounded) y = 0;
 
