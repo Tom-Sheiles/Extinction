@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,9 +7,12 @@ public class PlayerCameraControl : MonoBehaviour
 {
     public float mouseSensitivity = 1.0f;
     public float cameraSmoothFactor = 0.1f;
+    public float crouchHeight = 0.35f;
+    public float crouchSpeed = 0.4f;
     [SerializeField] GameObject playerCamera = null;
     [SerializeField] Transform thirdPersonPosition = null;
     [SerializeField] Transform firstPersonPosition = null;
+    private PlayerMovement playerMovement;
     public float cameraSwitchSpeed = 0.5f;
     float targetX = 0, targetY = 0;
     float cameraX = 0, cameraY = 0;
@@ -16,18 +20,16 @@ public class PlayerCameraControl : MonoBehaviour
     private bool isThirdPerson = false;
 
 
-    private void Start()
+    private void getStateInput()
     {
-        firstPersonPosition.position = playerCamera.transform.position;
-        Cursor.lockState = CursorLockMode.Locked;
+        if (Input.GetKeyDown(KeyCode.F)) isThirdPerson = !isThirdPerson;
+        if(Input.GetButtonDown("Escape")) { }
     }
 
 
-    private void Update()
+    private void checkCameraMode()
     {
-        if(Input.GetKeyDown(KeyCode.F)) isThirdPerson = !isThirdPerson;
-
-        if(isThirdPerson)
+        if (isThirdPerson)
         {
             playerCamera.transform.position = Vector3.Lerp(playerCamera.transform.position, thirdPersonPosition.position, cameraSwitchSpeed);
             playerCamera.transform.LookAt(transform);
@@ -36,6 +38,36 @@ public class PlayerCameraControl : MonoBehaviour
         {
             playerCamera.transform.position = Vector3.Lerp(playerCamera.transform.position, firstPersonPosition.position, cameraSwitchSpeed);
         }
+    }
+
+
+    private void handleCrouch()
+    {
+        if (!playerMovement.isCrouching)
+        {
+            playerCamera.transform.position = Vector3.Lerp(playerCamera.transform.position, firstPersonPosition.position, crouchSpeed);
+        }
+        else
+        {
+            Vector3 crouchPosition = firstPersonPosition.position;
+            crouchPosition.y -= crouchHeight;
+            playerCamera.transform.position = Vector3.Lerp(playerCamera.transform.position, crouchPosition, crouchSpeed);
+        }
+    }
+
+
+    private void Start()
+    {
+        playerMovement = GetComponent<PlayerMovement>();
+        firstPersonPosition.position = playerCamera.transform.position;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+
+    private void Update()
+    {
+        checkCameraMode();
+        handleCrouch();
 
         targetX += -Input.GetAxis("Mouse Y");
         targetY += Input.GetAxis("Mouse X");
