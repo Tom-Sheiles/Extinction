@@ -9,13 +9,15 @@ public class Wander : State
     NavMeshAgent agent;
     int waypointTarget = 0;
     Transform playerTransform;
+    PlayerMovement playerMovement;
 
     public override void onStateEnter(GameObject context)
     {
-        this.stateContext = context;
+        stateContext = context;
         infected = context.GetComponent<Infected>();
         agent = context.GetComponent<NavMeshAgent>();
         playerTransform = infected.playerTransform;
+        playerMovement = playerTransform.GetComponent<PlayerMovement>();
 
         agent.speed = infected.walkingSpeed;
         agent.destination = infected.waypoints[waypointTarget].position;
@@ -33,9 +35,14 @@ public class Wander : State
     public override bool checkStateSwitch()
     {
         Vector3 targetDir = playerTransform.position - stateContext.transform.position;
-        float angle = Vector3.Angle(targetDir, stateContext.transform.forward);
+        float angleToPlayer = Vector3.Angle(targetDir, stateContext.transform.forward);
+        float distanceToPlayer = Vector3.Distance(stateContext.transform.position, playerTransform.position);
 
-        if(angle <= infected.visionAngle)
+        float visionRange;
+        if (playerMovement.isCrouching) visionRange = infected.crouchingVisionRange;
+        else visionRange = infected.walkingVisionRange;
+
+        if(angleToPlayer <= infected.visionAngle && distanceToPlayer <= visionRange)
         {
             nextState = new Chase();
             return true;
@@ -64,7 +71,7 @@ public class Chase : State {
 
     public override void onStateEnter(GameObject context)
     {
-        this.stateContext = context;
+        stateContext = context;
         infected = context.GetComponent<Infected>();
         agent = context.GetComponent<NavMeshAgent>();
         playerTransform = infected.playerTransform;
