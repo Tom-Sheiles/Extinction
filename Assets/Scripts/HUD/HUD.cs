@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class HUD : MonoBehaviour
@@ -47,8 +45,9 @@ public class HUD : MonoBehaviour
         // Ensure that there is a player
         if (player)
         {
+            
             SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().ToString());
-            SetItemValues(player.selectedItem.GetComponent<IPlayerItem>());
+            SetActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
             SetCrosshairSize();
         } 
         else
@@ -67,7 +66,7 @@ public class HUD : MonoBehaviour
         {
             timeSinceLastUpdate = 0.0f;          
             SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().ToString());
-            SetItemValues(player.selectedItem.GetComponent<IPlayerItem>());
+            SetActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
         }        
     }
 
@@ -92,10 +91,10 @@ public class HUD : MonoBehaviour
     }
 
     // Updates the current and maximum stack / clip information.
-    public void SetItemValues(IPlayerItem item)
+    public void SetActiveItemValues(IPlayerItem item)
     {
-        maximumStackSize.text = item.GetMaximumStackSize().ToString();
-        currentStackSize.text = item.GetCurrentStackSize().ToString();
+        maximumStackSize.text = item.GetReserveItemAmount().ToString();
+        currentStackSize.text = item.GetCurrentItemAmount().ToString();
     }
 
     // Sets the dimensions of the crosshair.

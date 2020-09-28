@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using UnityEditor.UIElements;
-using UnityEngine;
-using UnityStandardAssets.CrossPlatformInput;
+﻿using UnityEngine;
 
 public class Player : MonoBehaviour
 {
@@ -23,6 +16,11 @@ public class Player : MonoBehaviour
 
     public GameObject selectedItem;
 
+    // Position where weapon fire originate from
+    public Camera playerPOV;
+
+    // Additive time since the last frame completion 
+    private float timeElapsed;
 
     // Start is called before the first frame update
     void Start()
@@ -33,13 +31,33 @@ public class Player : MonoBehaviour
             HideItems();
             SetSelectedItem(secondaryWeapon);
         }
+
+        timeElapsed = 0.0f;
     }
 
     // Update is called once per frame
     void Update()
     {
+        timeElapsed += Time.deltaTime;
+
+        // Set player POV camera ot the camera that is attached to the FirstPersonCharacter.
+        playerPOV = GetComponentInChildren<Camera>();
+
         // See if the player has changed items.
         CheckForItemChange();
+
+        // If the player has a firable item selected then check if the player is firing
+        if (HasWeaponSelected())
+        {
+            CheckForWeaponFire();
+            CheckForReload();
+        }
+    }
+
+    // Checks to see if a weapon is selected.
+    private bool HasWeaponSelected()
+    {
+        return selectedItem == primaryWeapon || selectedItem == secondaryWeapon;
     }
 
     // Checks to see if keys 1-4 have been pressed to trigger item change.
@@ -71,6 +89,90 @@ public class Player : MonoBehaviour
         {
             SetSelectedItem(item);
         }
+    }
+
+    // Checks if the fire button (left click) has been pressed or is being held.
+    private void CheckForWeaponFire()
+    {
+        if(Input.GetButtonDown("Fire1") || Input.GetMouseButton(0))
+        {
+            Weapon weapon = selectedItem.GetComponent<Weapon>();
+            if (timeElapsed >= weapon.fireRate)
+            {
+                FireWeapon(weapon);
+                timeElapsed = 0.0f;
+            }
+        }
+    }
+
+    private void CheckForReload()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ReloadWeapon(selectedItem.GetComponent<Weapon>());
+        }
+    }
+
+    // Handles the firing of the selected weapon
+    private void FireWeapon(Weapon weapon)
+    {
+        // Store information about the target that was hit
+        RaycastHit hit;
+
+        // Play the sound of the weapon firing
+        PlaySound(weapon);
+
+        if (weapon.IsLoaded())
+        {         
+            // Expend a bullet when the weapon is fired
+            weapon.ammunitionInMagazine--;
+
+            // Check if anything was hit within the weapons range
+            if (Physics.Raycast(playerPOV.transform.position, playerPOV.transform.forward, out hit, weapon.weaponRange))
+            {
+
+                // If we hit a light bulb then destroy it. (turn off light and play sound)
+                if (hit.transform.name.ToLower().Contains("lightbulb"))
+                {
+                    hit.transform.GetComponent<AudioSource>().Play();
+                    hit.transform.GetComponentInChildren<Light>().enabled = false;
+                }
+                else
+                {       
+                    // Applies bullet holes if walls or buildings are hit.
+                    Instantiate(weapon.bulletHole, hit.point, Quaternion.FromToRotation(Vector3.back, hit.normal));            
+                }
+
+                // TODO: If an enemy is hit then see if it was a head or body shot and apply damage.
+                // Headshot is a kill on a basic enemy so add enemy total health to weapon damage
+                // Body shot just applies the weapons damage.
+            }
+        }
+
+        if (!weapon.IsLoaded())
+        {
+            ReloadWeapon(weapon);
+        }
+    }
+
+    // Tries to reload the currently selected weapon.
+    private void ReloadWeapon(Weapon weapon)
+    {
+        if (weapon.CanReload())
+        {
+            weapon.Reload();
+        } 
+        else
+        {
+            // Notify player that they have no ammunition left.
+        }
+    }
+
+    // Plays a sound associated with a weapon
+    private void PlaySound(Weapon weapon)
+    {
+        AudioSource audio = selectedItem.GetComponent<AudioSource>();
+        audio.PlayOneShot(weapon.IsLoaded() ? weapon.fireSound : weapon.noAmmunitionSound);
     }
 
     // Hides all items other than secondary weapon.

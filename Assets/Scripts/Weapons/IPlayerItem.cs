@@ -1,10 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public interface IPlayerItem
 {
-    int GetMaximumStackSize();
+    int GetReserveItemAmount();
 
-    int GetCurrentStackSize();
+    int GetCurrentItemAmount();
+
+    AudioClip GetItemSound();
+
+    bool HasSound();
 }
