@@ -20,6 +20,9 @@ public class Weapon : MonoBehaviour, IPlayerItem
     // the speed at which the weapon fires
     public float fireRate;
 
+    // Time that a reload of the weapon takes
+    public float reloadTime;
+
     // The ammount of damage that each bullet inflicts
     public float weaponDamage;
 
@@ -31,6 +34,8 @@ public class Weapon : MonoBehaviour, IPlayerItem
 
     // The sound to play when the weapon is out of ammunition
     public AudioClip noAmmunitionSound;
+
+    public AudioClip reloadSound;
 
     // Object that will spawn if a bullet hits a solid object
     public GameObject bulletHole;
@@ -57,6 +62,11 @@ public class Weapon : MonoBehaviour, IPlayerItem
             ammunitionInMagazine += ammunitionInReserve >= spaceInMagazine ? spaceInMagazine : ammunitionInReserve;
             ammunitionInReserve = ammunitionInReserve - spaceInMagazine >= 0 ? ammunitionInReserve - spaceInMagazine : 0;
         }
+    }
+
+    public string GetItemName()
+    {
+        return weaponType;
     }
 
     public int GetReserveItemAmount()

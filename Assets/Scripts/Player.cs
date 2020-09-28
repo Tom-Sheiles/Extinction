@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class Player : MonoBehaviour
 {
@@ -22,6 +23,9 @@ public class Player : MonoBehaviour
     // Additive time since the last frame completion 
     private float timeElapsed;
 
+    // Flag indicating if reloading is happening
+    private bool isReloading;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +36,7 @@ public class Player : MonoBehaviour
             SetSelectedItem(secondaryWeapon);
         }
 
+        isReloading = false;
         timeElapsed = 0.0f;
     }
 
@@ -43,14 +48,17 @@ public class Player : MonoBehaviour
         // Set player POV camera ot the camera that is attached to the FirstPersonCharacter.
         playerPOV = GetComponentInChildren<Camera>();
 
-        // See if the player has changed items.
-        CheckForItemChange();
-
-        // If the player has a firable item selected then check if the player is firing
-        if (HasWeaponSelected())
+        if (!isReloading)
         {
-            CheckForWeaponFire();
-            CheckForReload();
+            // See if the player has changed items.
+            CheckForItemChange();
+
+            // If the player has a firable item selected then check if the player is firing
+            if (HasWeaponSelected())
+            {
+                CheckForWeaponFire();
+                CheckForReload();
+            }
         }
     }
 
@@ -109,7 +117,7 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            ReloadWeapon(selectedItem.GetComponent<Weapon>());
+            StartCoroutine(ReloadWeapon(selectedItem.GetComponent<Weapon>()));
         }
     }
 
@@ -120,7 +128,7 @@ public class Player : MonoBehaviour
         RaycastHit hit;
 
         // Play the sound of the weapon firing
-        PlaySound(weapon);
+        PlaySound(weapon.IsLoaded() ? weapon.fireSound : weapon.noAmmunitionSound);
 
         if (weapon.IsLoaded())
         {         
@@ -148,31 +156,41 @@ public class Player : MonoBehaviour
                 // Body shot just applies the weapons damage.
             }
         }
-
-        if (!weapon.IsLoaded())
+        else
         {
             ReloadWeapon(weapon);
         }
     }
 
     // Tries to reload the currently selected weapon.
-    private void ReloadWeapon(Weapon weapon)
+    private IEnumerator ReloadWeapon(Weapon weapon)
     {
         if (weapon.CanReload())
         {
+            // If already reloading then discontinue
+            if (isReloading)
+            {
+                yield break;
+            }
+
+            // Weapon is now reloading, wait for the reload time and then reload.
+            isReloading = true;
+            PlaySound(weapon.reloadSound);
+            yield return new WaitForSeconds(weapon.reloadTime);
             weapon.Reload();
-        } 
+            isReloading = false;            
+        }
         else
         {
-            // Notify player that they have no ammunition left.
+            // Notify player that they have no ammunition left (text in the middle of the screen or something).
         }
     }
 
     // Plays a sound associated with a weapon
-    private void PlaySound(Weapon weapon)
+    private void PlaySound(AudioClip soundClip)
     {
         AudioSource audio = selectedItem.GetComponent<AudioSource>();
-        audio.PlayOneShot(weapon.IsLoaded() ? weapon.fireSound : weapon.noAmmunitionSound);
+        audio.PlayOneShot(soundClip);
     }
 
     // Hides all items other than secondary weapon.

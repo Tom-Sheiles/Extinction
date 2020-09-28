@@ -65,7 +65,7 @@ public class HUD : MonoBehaviour
         if (timeSinceLastUpdate >= updateRate)
         {
             timeSinceLastUpdate = 0.0f;          
-            SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().ToString());
+            SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().GetItemName());
             SetActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
         }        
     }
@@ -79,6 +79,7 @@ public class HUD : MonoBehaviour
             Image parentImage = item.GetComponentInParent<Image>();
 
             // If the item name is equal to the selected item then change the sprite around the item.
+            print(selectedItem);
             if (item.itemName == selectedItem)
             {
                 parentImage.sprite = selectedItemSprite;
