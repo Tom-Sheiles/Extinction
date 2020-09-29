@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class HUD : MonoBehaviour
@@ -47,8 +45,9 @@ public class HUD : MonoBehaviour
         // Ensure that there is a player
         if (player)
         {
+            
             SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().ToString());
-            SetItemValues(player.selectedItem.GetComponent<IPlayerItem>());
+            SetActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
             SetCrosshairSize();
         } 
         else
@@ -66,8 +65,8 @@ public class HUD : MonoBehaviour
         if (timeSinceLastUpdate >= updateRate)
         {
             timeSinceLastUpdate = 0.0f;          
-            SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().ToString());
-            SetItemValues(player.selectedItem.GetComponent<IPlayerItem>());
+            SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().GetItemName());
+            SetActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
         }        
     }
 
@@ -80,6 +79,7 @@ public class HUD : MonoBehaviour
             Image parentImage = item.GetComponentInParent<Image>();
 
             // If the item name is equal to the selected item then change the sprite around the item.
+            print(selectedItem);
             if (item.itemName == selectedItem)
             {
                 parentImage.sprite = selectedItemSprite;
@@ -92,10 +92,10 @@ public class HUD : MonoBehaviour
     }
 
     // Updates the current and maximum stack / clip information.
-    public void SetItemValues(IPlayerItem item)
+    public void SetActiveItemValues(IPlayerItem item)
     {
-        maximumStackSize.text = item.GetMaximumStackSize().ToString();
-        currentStackSize.text = item.GetCurrentStackSize().ToString();
+        maximumStackSize.text = item.GetReserveItemAmount().ToString();
+        currentStackSize.text = item.GetCurrentItemAmount().ToString();
     }
 
     // Sets the dimensions of the crosshair.
