@@ -49,19 +49,15 @@ public class Weapon : MonoBehaviour, IPlayerItem
     // See if their is enough ammunition to reload the weapon
     public bool CanReload()
     {
-        return ammunitionInReserve > 0;
+        return ammunitionInReserve > 0 && ammunitionInMagazine < magazineSize;
     }
 
     // Reloads the weapon
     public void Reload()
     {
-        // Only reload if you have reserve ammunition and missing ammunition in the magazine
-        if (ammunitionInReserve > 0 && ammunitionInMagazine < magazineSize)
-        {
-            var spaceInMagazine = magazineSize - ammunitionInMagazine;
-            ammunitionInMagazine += ammunitionInReserve >= spaceInMagazine ? spaceInMagazine : ammunitionInReserve;
-            ammunitionInReserve = ammunitionInReserve - spaceInMagazine >= 0 ? ammunitionInReserve - spaceInMagazine : 0;
-        }
+        var spaceInMagazine = magazineSize - ammunitionInMagazine;
+        ammunitionInMagazine += ammunitionInReserve >= spaceInMagazine ? spaceInMagazine : ammunitionInReserve;
+        ammunitionInReserve = ammunitionInReserve - spaceInMagazine >= 0 ? ammunitionInReserve - spaceInMagazine : 0;
     }
 
     public string GetItemName()

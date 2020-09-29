@@ -158,7 +158,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            ReloadWeapon(weapon);
+            StartCoroutine(ReloadWeapon(weapon));
         }
     }
 
