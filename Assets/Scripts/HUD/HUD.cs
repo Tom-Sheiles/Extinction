@@ -5,6 +5,7 @@ public class HUD : MonoBehaviour
 {
     // Player health bar
     public Image healthBar;
+    public Text healthText;
 
     // Player crosshair
     public Image crosshair;
@@ -39,6 +40,12 @@ public class HUD : MonoBehaviour
     // How often the HUD should update.
     private float updateRate = 0.25f;
 
+    public Color lowHealthColor;
+    private Color defaultHealthColor;
+    PlayerHealth playerHealth;
+    float healthBarInitialWidth;
+    float healthBarCurrentWidth;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -49,6 +56,10 @@ public class HUD : MonoBehaviour
             SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().ToString());
             SetActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
             SetCrosshairSize();
+
+            playerHealth = player.GetComponent<PlayerHealth>();
+            healthBarInitialWidth = healthBar.rectTransform.rect.width;
+            defaultHealthColor = healthBar.color;
         } 
         else
         {
@@ -67,6 +78,24 @@ public class HUD : MonoBehaviour
             timeSinceLastUpdate = 0.0f;          
             SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().GetItemName());
             SetActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
+
+            float currentHealth = playerHealth.getCurrentHealth();
+            float maxHealth = playerHealth.getMaxHealth();
+
+            healthText.text = currentHealth.ToString();
+            float healthPercent = currentHealth / maxHealth;
+
+            healthBarCurrentWidth = healthBarInitialWidth * healthPercent;
+            healthBar.rectTransform.sizeDelta = new Vector2(healthBarCurrentWidth, healthBar.rectTransform.rect.height);
+
+            if(currentHealth <= (maxHealth/2))
+            {
+                healthBar.color = lowHealthColor;
+            }
+            else
+            {
+                healthBar.color = defaultHealthColor;
+            }
         }        
     }
 

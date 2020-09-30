@@ -7,16 +7,14 @@ using UnityEngine;
 
 public class FiniteStateMachine : MonoBehaviour
 {
+    public float AITickRate = 0.15f;
     private State currentState;
     public bool machinePaused = false;
     private bool initalized = false;
 
     [HideInInspector][SerializeField]public int stateIndex;
 
-    private void Start()
-    {
-        //StartStateMachine();
-    }
+    private float timeSinceLastUpdate = 0f;
 
     // Finds reference to all subclasses of MachineType and initalizes the state machine selected in the inspector.
     public void StartStateMachine()
@@ -49,15 +47,21 @@ public class FiniteStateMachine : MonoBehaviour
     {
         if (!initalized || machinePaused) return;
 
-        if(!currentState.checkStateSwitch())
+        timeSinceLastUpdate += Time.deltaTime;
+
+        if (timeSinceLastUpdate >= AITickRate)
         {
-            currentState.onStateTick();
-        }
-        else
-        {
-            State newState = currentState.onStateExit();
-            currentState = newState;
-            currentState.onStateEnter(gameObject);
+            AITickRate = 0f;
+            if (!currentState.checkStateSwitch())
+            {
+                currentState.onStateTick();
+            }
+            else
+            {
+                State newState = currentState.onStateExit();
+                currentState = newState;
+                currentState.onStateEnter(gameObject);
+            }
         }
     }
 }

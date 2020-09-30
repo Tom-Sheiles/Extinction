@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Infected : MonoBehaviour
 {
+    [Header("Movement Variables")]
     public Transform[] waypoints;
     public float waypointStopDistance = 0.1f;
     public float walkingSpeed = 1f;
@@ -16,15 +17,22 @@ public class Infected : MonoBehaviour
     public float maxVisionDistance = 10f;
     public float distanceIncreaseRatio = 5f;
     public float noticeTime = 5f;
-    public bool drawVisionRanges = true;
-    public bool drawPath = true;
 
+    [Header("Attack Variables")]
+    public float attackDamge = 10f;
+    public float attackSpeed = 1.5f;
+    public float attackRange = 3.0f;
+
+    [Header("UI")]
     public GameObject visionIndicator;
     public Color alertColor;
     public Color spottedColor;
+    [HideInInspector] public Image visionImage;
+    [HideInInspector] public Transform playerTransform;
 
-    [HideInInspector]public Image visionImage;
-    public Transform playerTransform;
+    [Header("Misc")]
+    public bool drawVisionRanges = true;
+    public bool drawPath = true;
 
     private void Start()
     {
@@ -54,6 +62,7 @@ public class Infected : MonoBehaviour
         {
             Gizmos.DrawWireSphere(transform.position, maxVisionDistance);
             Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, attackRange);
             Vector3 pos = transform.position;
             pos.y += 1;
 

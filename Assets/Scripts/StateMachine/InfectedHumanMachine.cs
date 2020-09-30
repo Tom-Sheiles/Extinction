@@ -31,7 +31,6 @@ public class Wander : State
         if (infected.waypoints.Length > 0)
         {
             float distanceToWaypoint = Vector3.Distance(stateContext.transform.position, infected.waypoints[waypointTarget].position);
-            Debug.Log(distanceToWaypoint);
             if (distanceToWaypoint <= infected.waypointStopDistance)
             {
                 getNextWaypoint();
@@ -57,7 +56,7 @@ public class Wander : State
            
             seenTimer += (seenIncrease * seenMultiplier);
 
-            Debug.Log("Seen timer: " + seenTimer + " increasing at " + seenIncrease + " per second");
+            //Debug.Log("Seen timer: " + seenTimer + " increasing at " + seenIncrease + " per second");
 
             // if the enemy has seen the player for enough time
             if(seenTimer >= infected.noticeTime)
@@ -125,7 +124,20 @@ public class Chase : State {
             infected.visionIndicator.SetActive(false);
         }
     }
+
+    public override bool checkStateSwitch()
+    {
+        float dist = Vector3.Distance(stateContext.transform.position, playerTransform.position);
+        if(dist <= infected.attackRange)
+        {
+            nextState = new MeleeAttack();
+            return true;
+        }
+
+        return false;
+    }
 }
+
 
 
 public class Dead : State
@@ -140,15 +152,63 @@ public class Dead : State
     }
 }
 
-// All subclasses of MachineType are automatically added to state machine list
-public class ZombieExample : MachineType
+
+public class MeleeAttack : State
 {
-   public ZombieExample()
+    Infected infected;
+    Transform playerTransform;
+    float attackCooldown = 0;
+
+    public override void onStateEnter(GameObject context)
+    {
+        base.onStateEnter(context);
+        infected = context.GetComponent<Infected>();
+        playerTransform = infected.playerTransform;
+    }
+
+    public override void onStateTick()
+    {
+
+        if(attackCooldown > 0)
+        {
+            attackCooldown -= Time.deltaTime;
+        }
+        else if(attackCooldown < 0)
+        {
+            attackCooldown = 0;
+        }
+
+        if(attackCooldown <= 0)
+        {
+            playerTransform.GetComponent<PlayerHealth>().takeDamage(infected.attackDamge);
+            attackCooldown = infected.attackSpeed;
+        }
+    }
+
+    public override bool checkStateSwitch()
+    {
+        float dist = Vector3.Distance(stateContext.transform.position, playerTransform.position);
+        if(dist > infected.attackRange)
+        {
+            nextState = new Chase();
+            return true;
+        }
+
+        return false;
+    }
+}
+
+
+// All subclasses of MachineType are automatically added to state machine list
+public class InfectedHumanMachine : MachineType
+{
+   public InfectedHumanMachine()
     {
         possibleStates = new List<State>
         {
             new Wander(),
             new Chase(),
+            new MeleeAttack(),
             new Dead()
         };
     }
