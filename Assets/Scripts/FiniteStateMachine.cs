@@ -9,6 +9,7 @@ public class FiniteStateMachine : MonoBehaviour
 {
     public float AITickRate = 0.15f;
     private State currentState;
+    private MachineType machine;
     public bool machinePaused = false;
     private bool initalized = false;
 

@@ -18,6 +18,7 @@ public class EnemyHealth : MonoBehaviour
     public void takeDamage(float amount)
     {
         currentHealth -= amount;
+        //stateMachine.setCurrentState(new Chase());
         checkHealth();
     }
 
@@ -25,7 +26,6 @@ public class EnemyHealth : MonoBehaviour
     {
         if(currentHealth <= 0)
         {
-            Debug.Log(gameObject.name + " Died");
             stateMachine.setCurrentState(new Dead());
         }
     }

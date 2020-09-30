@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Infected : MonoBehaviour
+public class Infected : MonoBehaviour, IMelee
 {
     [Header("Movement Variables")]
     public Transform[] waypoints;
@@ -75,5 +75,30 @@ public class Infected : MonoBehaviour
             Gizmos.DrawRay(pos, RVector * maxVisionDistance);
 
         }
+    }
+
+    public float getDamage()
+    {
+        return attackDamge;
+    }
+
+    public float getAttackSpeed()
+    {
+        return attackSpeed;
+    }
+
+    public float getAttackRange()
+    {
+        return attackRange;
+    }
+
+    public float getChaseSpeed()
+    {
+        return chaseSpeed;
+    }
+
+    public Transform getTargetTransform()
+    {
+        return playerTransform;
     }
 }

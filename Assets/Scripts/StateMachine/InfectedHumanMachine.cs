@@ -87,7 +87,7 @@ public class Wander : State
 
 public class Chase : State {
 
-    Infected infected;
+    IMelee melee;
     NavMeshAgent agent;
     Transform playerTransform;
 
@@ -100,12 +100,12 @@ public class Chase : State {
     public override void onStateEnter(GameObject context)
     {
         stateContext = context;
-        infected = context.GetComponent<Infected>();
+        melee = context.GetComponent<IMelee>();
         agent = context.GetComponent<NavMeshAgent>();
-        playerTransform = infected.playerTransform;
+        playerTransform = melee.getTargetTransform();
 
         agent.SetDestination(playerTransform.position);
-        agent.speed = infected.chaseSpeed;
+        agent.speed = melee.getChaseSpeed();
     }
 
     public override void onStateTick()
@@ -121,14 +121,14 @@ public class Chase : State {
 
         if(visionTimer >= visionIndicatorTimeout)
         {
-            infected.visionIndicator.SetActive(false);
+            //melee.visionIndicator.SetActive(false);
         }
     }
 
     public override bool checkStateSwitch()
     {
         float dist = Vector3.Distance(stateContext.transform.position, playerTransform.position);
-        if(dist <= infected.attackRange)
+        if(dist <= melee.getAttackRange())
         {
             nextState = new MeleeAttack();
             return true;
@@ -155,15 +155,15 @@ public class Dead : State
 
 public class MeleeAttack : State
 {
-    Infected infected;
+    IMelee melee;
     Transform playerTransform;
     float attackCooldown = 0;
 
     public override void onStateEnter(GameObject context)
     {
         base.onStateEnter(context);
-        infected = context.GetComponent<Infected>();
-        playerTransform = infected.playerTransform;
+        melee = context.GetComponent<IMelee>();
+        playerTransform = melee.getTargetTransform();
     }
 
     public override void onStateTick()
@@ -180,15 +180,15 @@ public class MeleeAttack : State
 
         if(attackCooldown <= 0)
         {
-            playerTransform.GetComponent<PlayerHealth>().takeDamage(infected.attackDamge);
-            attackCooldown = infected.attackSpeed;
+            playerTransform.GetComponent<PlayerHealth>().takeDamage(melee.getDamage());
+            attackCooldown = melee.getAttackSpeed();
         }
     }
 
     public override bool checkStateSwitch()
     {
         float dist = Vector3.Distance(stateContext.transform.position, playerTransform.position);
-        if(dist > infected.attackRange)
+        if(dist > melee.getAttackRange())
         {
             nextState = new Chase();
             return true;
