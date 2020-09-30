@@ -15,7 +15,7 @@ public class FiniteStateMachine : MonoBehaviour
 
     private void Start()
     {
-        StartStateMachine();
+        //StartStateMachine();
     }
 
     // Finds reference to all subclasses of MachineType and initalizes the state machine selected in the inspector.

@@ -17,33 +17,38 @@ public class Infected : MonoBehaviour
     public float distanceIncreaseRatio = 5f;
     public float noticeTime = 5f;
     public bool drawVisionRanges = true;
+    public bool drawPath = true;
 
     public GameObject visionIndicator;
     public Color alertColor;
     public Color spottedColor;
 
     [HideInInspector]public Image visionImage;
-    [HideInInspector]public Transform playerTransform;
+    public Transform playerTransform;
 
     private void Start()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         visionImage = visionIndicator.GetComponentInChildren<Image>();
+
+        GetComponent<FiniteStateMachine>().StartStateMachine();
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
-
-        if (waypoints.Length > 1)
+        if (drawPath)
         {
-            for (int i = 0; i < waypoints.Length - 1; i++)
-            {
-                Gizmos.DrawLine(waypoints[i].position, waypoints[i + 1].position);
-            }
-            Gizmos.DrawLine(waypoints[waypoints.Length - 1].position, waypoints[0].position);
-        }
+            Gizmos.color = Color.yellow;
 
+            if (waypoints.Length > 1)
+            {
+                for (int i = 0; i < waypoints.Length - 1; i++)
+                {
+                    Gizmos.DrawLine(waypoints[i].position, waypoints[i + 1].position);
+                }
+                Gizmos.DrawLine(waypoints[waypoints.Length - 1].position, waypoints[0].position);
+            }
+        }
 
         if (drawVisionRanges)
         {
