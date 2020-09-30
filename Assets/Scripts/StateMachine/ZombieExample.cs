@@ -10,6 +10,7 @@ public class Wander : State
     int waypointTarget = 0;
     Transform playerTransform;
     PlayerMovement playerMovement;
+    float seenTimer = 0;
 
     public override void onStateEnter(GameObject context)
     {
@@ -20,15 +21,21 @@ public class Wander : State
         playerMovement = playerTransform.GetComponent<PlayerMovement>();
 
         agent.speed = infected.walkingSpeed;
-        agent.destination = infected.waypoints[waypointTarget].position;
+
+        if(infected.waypoints.Length > 0)
+            agent.destination = infected.waypoints[waypointTarget].position;
     }
 
     public override void onStateTick()
     {
-        float distanceToWaypoint = Vector3.Distance(stateContext.transform.position, infected.waypoints[waypointTarget].position);
-        if(distanceToWaypoint <= infected.waypointStopDistance)
+        if (infected.waypoints.Length > 0)
         {
-            getNextWaypoint();
+            float distanceToWaypoint = Vector3.Distance(stateContext.transform.position, infected.waypoints[waypointTarget].position);
+            Debug.Log(distanceToWaypoint);
+            if (distanceToWaypoint <= infected.waypointStopDistance)
+            {
+                getNextWaypoint();
+            }
         }
     }
 
@@ -38,14 +45,33 @@ public class Wander : State
         float angleToPlayer = Vector3.Angle(targetDir, stateContext.transform.forward);
         float distanceToPlayer = Vector3.Distance(stateContext.transform.position, playerTransform.position);
 
-        float visionRange;
-        if (playerMovement.isCrouching) visionRange = infected.crouchingVisionRange;
-        else visionRange = infected.walkingVisionRange;
-
-        if(angleToPlayer <= infected.visionAngle && distanceToPlayer <= visionRange)
+        // If player is within field of view
+        if(angleToPlayer <= infected.visionAngle && distanceToPlayer <= infected.maxVisionDistance)
         {
-            nextState = new Chase();
-            return true;
+            infected.visionIndicator.SetActive(true);
+            //infected.visionImage.color = infected.alertColor;
+            float seenIncrease = infected.distanceIncreaseRatio / distanceToPlayer;
+            float seenMultiplier = 1f;
+
+            if (playerMovement.isCrouching) seenMultiplier = infected.crouchingVisionmultiplier;
+           
+            seenTimer += (seenIncrease * seenMultiplier);
+
+            Debug.Log("Seen timer: " + seenTimer + " increasing at " + seenIncrease + " per second");
+
+            // if the enemy has seen the player for enough time
+            if(seenTimer >= infected.noticeTime)
+            {
+                infected.visionImage.color = infected.spottedColor;
+                nextState = new Chase();
+                return true;
+            }
+        }
+        else
+        {
+            seenTimer = 0;
+            agent.speed = infected.walkingSpeed;
+            infected.visionIndicator.SetActive(false);
         }
 
         return false;
@@ -69,6 +95,9 @@ public class Chase : State {
     float timeBetweenRecalc = 0.1f;
     float recalcuateDestTimer = 0;
 
+    float visionIndicatorTimeout = 1.0f;
+    float visionTimer = 0;
+
     public override void onStateEnter(GameObject context)
     {
         stateContext = context;
@@ -77,17 +106,37 @@ public class Chase : State {
         playerTransform = infected.playerTransform;
 
         agent.SetDestination(playerTransform.position);
+        agent.speed = infected.chaseSpeed;
     }
 
     public override void onStateTick()
     {
         recalcuateDestTimer += Time.deltaTime;
+        visionTimer += Time.deltaTime;
 
         if(recalcuateDestTimer >= timeBetweenRecalc)
         {
             agent.SetDestination(playerTransform.position);
             recalcuateDestTimer = 0;
         }
+
+        if(visionTimer >= visionIndicatorTimeout)
+        {
+            infected.visionIndicator.SetActive(false);
+        }
+    }
+}
+
+
+public class Dead : State
+{
+    NavMeshAgent agent;
+    public override void onStateEnter(GameObject context)
+    {
+        base.onStateEnter(context);
+        agent = context.GetComponent<NavMeshAgent>();
+        agent.SetDestination(context.transform.position);
+        context.SetActive(false);
     }
 }
 
@@ -99,7 +148,8 @@ public class ZombieExample : MachineType
         possibleStates = new List<State>
         {
             new Wander(),
-            new Chase()
+            new Chase(),
+            new Dead()
         };
     }
 }

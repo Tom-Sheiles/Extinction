@@ -15,7 +15,7 @@ public class FiniteStateMachine : MonoBehaviour
 
     private void Start()
     {
-        StartStateMachine();
+        //StartStateMachine();
     }
 
     // Finds reference to all subclasses of MachineType and initalizes the state machine selected in the inspector.
@@ -35,6 +35,13 @@ public class FiniteStateMachine : MonoBehaviour
             return currentState.ToString();
         else
             return "None";
+    }
+
+    public void setCurrentState(State state)
+    {
+        currentState.onStateExit();
+        currentState = state;
+        currentState.onStateEnter(gameObject);
     }
 
 
