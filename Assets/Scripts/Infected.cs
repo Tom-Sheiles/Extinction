@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Infected : MonoBehaviour
 {
@@ -16,11 +17,18 @@ public class Infected : MonoBehaviour
     public float distanceIncreaseRatio = 5f;
     public float noticeTime = 5f;
     public bool drawVisionRanges = true;
-    public Transform playerTransform;
+
+    public GameObject visionIndicator;
+    public Color alertColor;
+    public Color spottedColor;
+
+    [HideInInspector]public Image visionImage;
+    [HideInInspector]public Transform playerTransform;
 
     private void Start()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        visionImage = visionIndicator.GetComponentInChildren<Image>();
     }
 
     private void OnDrawGizmos()

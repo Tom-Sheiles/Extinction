@@ -47,6 +47,8 @@ public class Wander : State
         // If player is within field of view
         if(angleToPlayer <= infected.visionAngle && distanceToPlayer <= infected.maxVisionDistance)
         {
+            infected.visionIndicator.SetActive(true);
+            //infected.visionImage.color = infected.alertColor;
             float seenIncrease = infected.distanceIncreaseRatio / distanceToPlayer;
             float seenMultiplier = 1f;
 
@@ -59,6 +61,7 @@ public class Wander : State
             // if the enemy has seen the player for enough time
             if(seenTimer >= infected.noticeTime)
             {
+                infected.visionImage.color = infected.spottedColor;
                 nextState = new Chase();
                 return true;
             }
@@ -67,6 +70,7 @@ public class Wander : State
         {
             seenTimer = 0;
             agent.speed = infected.walkingSpeed;
+            infected.visionIndicator.SetActive(false);
         }
 
         return false;
@@ -90,6 +94,9 @@ public class Chase : State {
     float timeBetweenRecalc = 0.1f;
     float recalcuateDestTimer = 0;
 
+    float visionIndicatorTimeout = 1.0f;
+    float visionTimer = 0;
+
     public override void onStateEnter(GameObject context)
     {
         stateContext = context;
@@ -104,11 +111,17 @@ public class Chase : State {
     public override void onStateTick()
     {
         recalcuateDestTimer += Time.deltaTime;
+        visionTimer += Time.deltaTime;
 
         if(recalcuateDestTimer >= timeBetweenRecalc)
         {
             agent.SetDestination(playerTransform.position);
             recalcuateDestTimer = 0;
+        }
+
+        if(visionTimer >= visionIndicatorTimeout)
+        {
+            infected.visionIndicator.SetActive(false);
         }
     }
 }
