@@ -41,10 +41,12 @@ public class HUD : MonoBehaviour
     private float updateRate = 0.25f;
 
     public Color lowHealthColor;
+    public HealthFlash healthFlash;
     private Color defaultHealthColor;
     PlayerHealth playerHealth;
     float healthBarInitialWidth;
     float healthBarCurrentWidth;
+    float lastHealth;
 
     // Start is called before the first frame update
     void Start()
@@ -60,6 +62,7 @@ public class HUD : MonoBehaviour
             playerHealth = player.GetComponent<PlayerHealth>();
             healthBarInitialWidth = healthBar.rectTransform.rect.width;
             defaultHealthColor = healthBar.color;
+            lastHealth = 100;
         } 
         else
         {
@@ -88,6 +91,12 @@ public class HUD : MonoBehaviour
             healthBarCurrentWidth = healthBarInitialWidth * healthPercent;
             healthBar.rectTransform.sizeDelta = new Vector2(healthBarCurrentWidth, healthBar.rectTransform.rect.height);
 
+            // If damage has been take since last update
+            if(currentHealth != lastHealth)
+            {
+                healthFlash.fadeIn();
+            }
+
             if(currentHealth <= (maxHealth/2))
             {
                 healthBar.color = lowHealthColor;
@@ -96,6 +105,8 @@ public class HUD : MonoBehaviour
             {
                 healthBar.color = defaultHealthColor;
             }
+
+            lastHealth = currentHealth;
         }        
     }
 
