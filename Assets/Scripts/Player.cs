@@ -145,6 +145,15 @@ public class Player : MonoBehaviour
                     hit.transform.GetComponent<AudioSource>().Play();
                     hit.transform.GetComponentInChildren<Light>().enabled = false;
                 }
+                else if (hit.transform.CompareTag("EnemyHead"))
+                {
+                    EnemyHealth enemyHealth = hit.transform.GetComponentInParent<EnemyHealth>();
+                    enemyHealth.takeDamage(enemyHealth.getMaxHealth());
+                }
+                else if(hit.transform.CompareTag("EnemyBody"))
+                {
+                    hit.transform.GetComponent<EnemyHealth>().takeDamage(weapon.weaponDamage);
+                }
                 else
                 {       
                     // Applies bullet holes if walls or buildings are hit.

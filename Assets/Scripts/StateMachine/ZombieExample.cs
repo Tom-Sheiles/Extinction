@@ -10,6 +10,7 @@ public class Wander : State
     int waypointTarget = 0;
     Transform playerTransform;
     PlayerMovement playerMovement;
+    float seenTimer = 0;
 
     public override void onStateEnter(GameObject context)
     {
@@ -20,15 +21,20 @@ public class Wander : State
         playerMovement = playerTransform.GetComponent<PlayerMovement>();
 
         agent.speed = infected.walkingSpeed;
-        agent.destination = infected.waypoints[waypointTarget].position;
+
+        if(infected.waypoints.Length > 0)
+            agent.destination = infected.waypoints[waypointTarget].position;
     }
 
     public override void onStateTick()
     {
-        float distanceToWaypoint = Vector3.Distance(stateContext.transform.position, infected.waypoints[waypointTarget].position);
-        if(distanceToWaypoint <= infected.waypointStopDistance)
+        if (infected.waypoints.Length > 0)
         {
-            getNextWaypoint();
+            float distanceToWaypoint = Vector3.Distance(stateContext.transform.position, infected.waypoints[waypointTarget].position);
+            if (distanceToWaypoint <= infected.waypointStopDistance)
+            {
+                getNextWaypoint();
+            }
         }
     }
 
@@ -38,14 +44,29 @@ public class Wander : State
         float angleToPlayer = Vector3.Angle(targetDir, stateContext.transform.forward);
         float distanceToPlayer = Vector3.Distance(stateContext.transform.position, playerTransform.position);
 
-        float visionRange;
-        if (playerMovement.isCrouching) visionRange = infected.crouchingVisionRange;
-        else visionRange = infected.walkingVisionRange;
-
-        if(angleToPlayer <= infected.visionAngle && distanceToPlayer <= visionRange)
+        // If player is within field of view
+        if(angleToPlayer <= infected.visionAngle && distanceToPlayer <= infected.maxVisionDistance)
         {
-            nextState = new Chase();
-            return true;
+            float seenIncrease = infected.distanceIncreaseRatio / distanceToPlayer;
+            float seenMultiplier = 1f;
+
+            if (playerMovement.isCrouching) seenMultiplier = infected.crouchingVisionmultiplier;
+           
+            seenTimer += (seenIncrease * seenMultiplier);
+
+            Debug.Log("Seen timer: " + seenTimer + " increasing at " + seenIncrease + " per second");
+
+            // if the enemy has seen the player for enough time
+            if(seenTimer >= infected.noticeTime)
+            {
+                nextState = new Chase();
+                return true;
+            }
+        }
+        else
+        {
+            seenTimer = 0;
+            agent.speed = infected.walkingSpeed;
         }
 
         return false;
@@ -77,6 +98,7 @@ public class Chase : State {
         playerTransform = infected.playerTransform;
 
         agent.SetDestination(playerTransform.position);
+        agent.speed = infected.chaseSpeed;
     }
 
     public override void onStateTick()
@@ -91,6 +113,19 @@ public class Chase : State {
     }
 }
 
+
+public class Dead : State
+{
+    NavMeshAgent agent;
+    public override void onStateEnter(GameObject context)
+    {
+        base.onStateEnter(context);
+        agent = context.GetComponent<NavMeshAgent>();
+        agent.SetDestination(context.transform.position);
+        context.SetActive(false);
+    }
+}
+
 // All subclasses of MachineType are automatically added to state machine list
 public class ZombieExample : MachineType
 {
@@ -99,7 +134,8 @@ public class ZombieExample : MachineType
         possibleStates = new List<State>
         {
             new Wander(),
-            new Chase()
+            new Chase(),
+            new Dead()
         };
     }
 }

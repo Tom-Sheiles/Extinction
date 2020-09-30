@@ -37,6 +37,13 @@ public class FiniteStateMachine : MonoBehaviour
             return "None";
     }
 
+    public void setCurrentState(State state)
+    {
+        currentState.onStateExit();
+        currentState = state;
+        currentState.onStateEnter(gameObject);
+    }
+
 
     private void Update()
     {
