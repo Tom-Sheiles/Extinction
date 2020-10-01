@@ -38,7 +38,7 @@ public class HUD : MonoBehaviour
     private float timeSinceLastUpdate = 0.0f;
 
     // How often the HUD should update.
-    private float updateRate = 0.25f;
+    private float updateRate = 0.1f;
 
     public Color lowHealthColor;
     public HealthFlash healthFlash;
@@ -54,9 +54,8 @@ public class HUD : MonoBehaviour
         // Ensure that there is a player
         if (player)
         {
-            
-            SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().ToString());
-            SetActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
+            UpdateActiveItem(player.selectedItem.GetComponent<IPlayerItem>().ToString());
+            UpdateActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
             SetCrosshairSize();
 
             playerHealth = player.GetComponent<PlayerHealth>();
@@ -77,10 +76,10 @@ public class HUD : MonoBehaviour
 
         // Lower the update rate a bit.
         if (timeSinceLastUpdate >= updateRate)
-        {
+        {            
             timeSinceLastUpdate = 0.0f;          
-            SetActiveItem(player.selectedItem.GetComponent<IPlayerItem>().GetItemName());
-            SetActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
+            UpdateActiveItem(player.selectedItem.GetComponent<IPlayerItem>().GetItemName());
+            UpdateActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());  
 
             float currentHealth = playerHealth.getCurrentHealth();
             float maxHealth = playerHealth.getMaxHealth();
@@ -107,11 +106,13 @@ public class HUD : MonoBehaviour
             }
 
             lastHealth = currentHealth;
+
         }        
     }
 
-    // Changes the border around the items to indicate which one is selected.
-    public void SetActiveItem(string selectedItem)
+
+    // Updates the border around the items to indicate which one is selected.
+    public void UpdateActiveItem(string selectedItem)
     {
         foreach(HUDItem item in playerItems)
         {
@@ -119,7 +120,6 @@ public class HUD : MonoBehaviour
             Image parentImage = item.GetComponentInParent<Image>();
 
             // If the item name is equal to the selected item then change the sprite around the item.
-            //print(selectedItem);
             if (item.itemName == selectedItem)
             {
                 parentImage.sprite = selectedItemSprite;
@@ -132,13 +132,13 @@ public class HUD : MonoBehaviour
     }
 
     // Updates the current and maximum stack / clip information.
-    public void SetActiveItemValues(IPlayerItem item)
+    public void UpdateActiveItemValues(IPlayerItem item)
     {
         maximumStackSize.text = item.GetReserveItemAmount().ToString();
         currentStackSize.text = item.GetCurrentItemAmount().ToString();
     }
 
-    // Sets the dimensions of the crosshair.
+    // Sets the width and height of the crosshair.
     public void SetCrosshairSize()
     {
         RectTransform crosshairDimensions = crosshair.GetComponent<RectTransform>();

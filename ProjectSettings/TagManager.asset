@@ -6,6 +6,7 @@ TagManager:
   tags:
   - EnemyHead
   - EnemyBody
+  - LightBulb
   layers:
   - Default
   - TransparentFX
