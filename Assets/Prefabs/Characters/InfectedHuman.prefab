@@ -19,7 +19,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &548136180
 RectTransform:
   m_ObjectHideFlags: 0
@@ -331,7 +331,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AITickRate: 0.15
   machinePaused: 0
-  stateIndex: 1
+  stateIndex: 2
 --- !u!114 &764744539605538670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -362,13 +362,14 @@ MonoBehaviour:
   attackDamge: 10
   attackSpeed: 1.5
   attackRange: 4
+  hitPercent: 0
   visionIndicator: {fileID: 548136179}
   alertColor: {r: 0.9811321, g: 0.9402063, b: 0.032395888, a: 0}
   spottedColor: {r: 0.6901961, g: 0.22352943, b: 0.29411766, a: 1}
   visionImage: {fileID: 0}
   playerTransform: {fileID: 0}
-  drawVisionRanges: 1
-  drawPath: 1
+  drawVisionRanges: 0
+  drawPath: 0
 --- !u!195 &764744539605538657
 NavMeshAgent:
   m_ObjectHideFlags: 0

@@ -119,7 +119,7 @@ public class HUD : MonoBehaviour
             Image parentImage = item.GetComponentInParent<Image>();
 
             // If the item name is equal to the selected item then change the sprite around the item.
-            print(selectedItem);
+            //print(selectedItem);
             if (item.itemName == selectedItem)
             {
                 parentImage.sprite = selectedItemSprite;

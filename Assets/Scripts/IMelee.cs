@@ -8,5 +8,6 @@ public interface IMelee
     float getAttackSpeed();
     float getAttackRange();
     float getChaseSpeed();
+    float hitChance();
     Transform getTargetTransform();
 }

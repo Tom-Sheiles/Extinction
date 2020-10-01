@@ -14,11 +14,15 @@ public class InfectedAnimal : MonoBehaviour, IMelee
     public float attackSpeed = 0.5f;
     public float attackRange = 2.0f;
 
+    [Range(0,100)]
+    public float hitPercent = 0.75f;
+
     public float chaseDistance = 10f;
     public float noticeRange = 20f;
     public GameObject visionIndicator;
 
     [HideInInspector]public Transform playerTransform;
+    public bool drawGizmos = true;
 
     private void Start()
     {
@@ -31,14 +35,16 @@ public class InfectedAnimal : MonoBehaviour, IMelee
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(transform.position, noticeRange);
-        Gizmos.color = Color.yellow;
+        if (drawGizmos)
+        {
+            Gizmos.DrawWireSphere(transform.position, noticeRange);
+            Gizmos.color = Color.yellow;
 
-        Gizmos.DrawWireSphere(transform.position, chaseDistance);
-        Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, chaseDistance);
+            Gizmos.color = Color.red;
 
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-
+            Gizmos.DrawWireSphere(transform.position, attackRange);
+        }
     }
 
     public float getDamage()
@@ -64,5 +70,10 @@ public class InfectedAnimal : MonoBehaviour, IMelee
     public Transform getTargetTransform()
     {
         return playerTransform;
+    }
+
+    public float hitChance()
+    {
+        return hitPercent;
     }
 }

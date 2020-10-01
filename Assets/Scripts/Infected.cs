@@ -23,6 +23,9 @@ public class Infected : MonoBehaviour, IMelee
     public float attackSpeed = 1.5f;
     public float attackRange = 3.0f;
 
+    [Range(0,100)]
+    public float hitPercent = 1.0f;
+
     [Header("UI")]
     public GameObject visionIndicator;
     public Color alertColor;
@@ -100,5 +103,10 @@ public class Infected : MonoBehaviour, IMelee
     public Transform getTargetTransform()
     {
         return playerTransform;
+    }
+
+    public float hitChance()
+    {
+        return hitPercent;
     }
 }
