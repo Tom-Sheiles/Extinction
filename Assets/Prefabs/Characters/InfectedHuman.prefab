@@ -329,8 +329,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37918ca0c9f2aa543a80070086b8fd09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AITickRate: 0.15
   machinePaused: 0
-  stateIndex: 0
+  stateIndex: 1
 --- !u!114 &764744539605538670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -346,6 +347,8 @@ MonoBehaviour:
   waypoints:
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   waypointStopDistance: 0.51
   walkingSpeed: 1.2
   chaseSpeed: 3.5
@@ -356,13 +359,16 @@ MonoBehaviour:
   maxVisionDistance: 30
   distanceIncreaseRatio: 5
   noticeTime: 50
-  drawVisionRanges: 1
-  drawPath: 1
+  attackDamge: 10
+  attackSpeed: 1.5
+  attackRange: 4
   visionIndicator: {fileID: 548136179}
   alertColor: {r: 0.9811321, g: 0.9402063, b: 0.032395888, a: 0}
   spottedColor: {r: 0.6901961, g: 0.22352943, b: 0.29411766, a: 1}
   visionImage: {fileID: 0}
   playerTransform: {fileID: 0}
+  drawVisionRanges: 1
+  drawPath: 1
 --- !u!195 &764744539605538657
 NavMeshAgent:
   m_ObjectHideFlags: 0

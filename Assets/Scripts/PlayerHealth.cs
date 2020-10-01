@@ -2,31 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyHealth : MonoBehaviour
+public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] float maxHealth = 100;
-
     private float currentHealth;
-    private FiniteStateMachine stateMachine;
 
     private void Start()
     {
-        stateMachine = GetComponent<FiniteStateMachine>();
         currentHealth = maxHealth;
     }
 
     public void takeDamage(float amount)
     {
         currentHealth -= amount;
-        //stateMachine.setCurrentState(new Chase());
         checkHealth();
     }
 
+
     private void checkHealth()
     {
-        if(currentHealth <= 0)
+        if (currentHealth <= 0)
         {
-            stateMachine.setCurrentState(new Dead());
+            currentHealth = 0;
+            Debug.Log(gameObject.name + " Died");
         }
     }
 
