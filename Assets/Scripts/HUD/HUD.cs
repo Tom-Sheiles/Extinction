@@ -6,12 +6,6 @@ public class HUD : MonoBehaviour
     // Player health bar
     public Image healthBar;
 
-    // Original size of the health bar
-    public float healthBarWidth;
-
-    // Player health text
-    public Text health;
-
     // Player crosshair
     public Image crosshair;
 
@@ -45,21 +39,15 @@ public class HUD : MonoBehaviour
     // How often the HUD should update.
     private float updateRate = 0.1f;
 
-    // Keeps track of the players health the last time that it was updated
-    private int playerHealthLastUpdate;
-
     // Start is called before the first frame update
     void Start()
     {
         // Ensure that there is a player
         if (player)
         {
-            
             UpdateActiveItem(player.selectedItem.GetComponent<IPlayerItem>().ToString());
             UpdateActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
             SetCrosshairSize();
-
-            healthBarWidth = healthBar.rectTransform.rect.width;
         } 
         else
         {
@@ -77,21 +65,10 @@ public class HUD : MonoBehaviour
         {            
             timeSinceLastUpdate = 0.0f;          
             UpdateActiveItem(player.selectedItem.GetComponent<IPlayerItem>().GetItemName());
-            UpdateActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
-            
-            // Only update if the players health has changed
-            if (PlayerHealthHasChanged())
-            {
-                UpdatePlayerHealth();
-            }
+            UpdateActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());          
         }        
     }
 
-    // Checks if the players health has changed since the last update
-    private bool PlayerHealthHasChanged()
-    {
-        return player.playerHealth != playerHealthLastUpdate;
-    }
 
     // Updates the border around the items to indicate which one is selected.
     public void UpdateActiveItem(string selectedItem)
@@ -125,19 +102,5 @@ public class HUD : MonoBehaviour
     {
         RectTransform crosshairDimensions = crosshair.GetComponent<RectTransform>();
         crosshairDimensions.sizeDelta = new Vector2(crosshairWidth, crosshairHeight);
-    }
-
-    // Updates the player health information
-    private void UpdatePlayerHealth()
-    {
-        playerHealthLastUpdate = player.playerHealth;
-
-        health.text = player.playerHealth.ToString();
-        RectTransform healthBarDimensions = healthBar.GetComponent<RectTransform>();
-        healthBarDimensions.sizeDelta = new Vector2(((float)player.playerHealth / player.playerMaximumHealth) * healthBarWidth, healthBarDimensions.sizeDelta.y);
-
-        // Change color based on health thresholds
-        Image healthBarImage = healthBar.GetComponent<Image>();
-        healthBarImage.color = player.playerHealth > 50 ? Color.white : Color.red;
     }
 }

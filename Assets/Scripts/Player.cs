@@ -3,12 +3,6 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    // The maximum health that the player can be
-    public int playerMaximumHealth = 100;
-
-    // The amount of health that the player has
-    public int playerHealth;
-
     // Primary weapon
     public GameObject primaryWeapon;
 
