@@ -97,7 +97,7 @@ public class HUD : MonoBehaviour
         currentStackSize.text = item.GetCurrentItemAmount().ToString();
     }
 
-    // Sets the dimensions of the crosshair.
+    // Sets the width and height of the crosshair.
     public void SetCrosshairSize()
     {
         RectTransform crosshairDimensions = crosshair.GetComponent<RectTransform>();
