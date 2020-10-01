@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    // All information reguarding player health
+    public PlayerHealth health;
+
     // Primary weapon
     public GameObject primaryWeapon;
 
@@ -31,12 +34,12 @@ public class Player : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {
-        // Set player health
-        playerHealth = playerMaximumHealth;
-
+    {        
         // Hide all items other than selected.
-        HideItems();               
+        HideItems();
+
+        // Get the health script
+        health = GetComponent<PlayerHealth>();
     }
 
     // Update is called once per frame
@@ -117,7 +120,7 @@ public class Player : MonoBehaviour
                     timeElapsed = 0.0f;
                 }
             }
-            else if (HasBandagesSelected() && playerHealth < playerMaximumHealth)
+            else if (HasBandagesSelected())
             {
                 Bandage bandage = selectedItem.GetComponent<Bandage>();
                 StartCoroutine(UseBandage(bandage));
@@ -206,7 +209,7 @@ public class Player : MonoBehaviour
     // Uses a bandage if the player chooses to do so
     private IEnumerator UseBandage(Bandage bandage)
     {
-        if (bandage.HasBandages())
+        if (bandage.HasBandages() && health.getCurrentHealth() < health.getMaxHealth())
         {
             // Break if player is already bandaging
             if (isBandaging)
@@ -218,7 +221,7 @@ public class Player : MonoBehaviour
             PlaySound(bandage.useBandageSound);
             yield return new WaitForSeconds(bandage.timeToBandage);
             bandage.UseBandage();
-            playerHealth = playerHealth + bandage.bandageHealAmount > playerMaximumHealth ? playerMaximumHealth : playerHealth += bandage.bandageHealAmount;
+            SendMessage("heal", bandage.bandageHealAmount);
             isBandaging = false;
         }
         else

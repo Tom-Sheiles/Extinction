@@ -91,7 +91,7 @@ public class HUD : MonoBehaviour
             healthBar.rectTransform.sizeDelta = new Vector2(healthBarCurrentWidth, healthBar.rectTransform.rect.height);
 
             // If damage has been take since last update
-            if(currentHealth != lastHealth)
+            if(currentHealth < lastHealth)
             {
                 healthFlash.fadeIn();
             }
