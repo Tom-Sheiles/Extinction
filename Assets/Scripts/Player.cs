@@ -3,6 +3,12 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    // The maximum health that the player can be
+    public int playerMaximumHealth = 100;
+
+    // The amount of health that the player has
+    public int playerHealth;
+
     // Primary weapon
     public GameObject primaryWeapon;
 
@@ -21,23 +27,22 @@ public class Player : MonoBehaviour
     public Camera playerPOV;
 
     // Additive time since the last frame completion 
-    private float timeElapsed;
+    private float timeElapsed = 0.0f;
 
     // Flag indicating if reloading is happening
-    private bool isReloading;
+    private bool isReloading = false;
+
+    // Flag indicating if the player is using a banadge
+    private bool isBandaging = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        // Set the weapon that the player starts with.
-        if (selectedItem == null)
-        {
-            HideItems();
-            SetSelectedItem(secondaryWeapon);
-        }
+        // Set player health
+        playerHealth = playerMaximumHealth;
 
-        isReloading = false;
-        timeElapsed = 0.0f;
+        // Hide all items other than selected.
+        HideItems();               
     }
 
     // Update is called once per frame
@@ -48,17 +53,16 @@ public class Player : MonoBehaviour
         // Set player POV camera ot the camera that is attached to the FirstPersonCharacter.
         playerPOV = GetComponentInChildren<Camera>();
 
-        if (!isReloading)
+        if (!isReloading || !isBandaging)
         {
             // See if the player has changed items.
             CheckForItemChange();
 
-            // If the player has a firable item selected then check if the player is firing
-            if (HasWeaponSelected())
-            {
-                CheckForWeaponFire();
-                CheckForReload();
-            }
+            // See if the player has hit the use item button.
+            CheckForItemUsage();
+
+            // See if the player has hit the reload button.
+            CheckForReload();
         }
     }
 
@@ -66,6 +70,12 @@ public class Player : MonoBehaviour
     private bool HasWeaponSelected()
     {
         return selectedItem == primaryWeapon || selectedItem == secondaryWeapon;
+    }
+
+    // Checks if the player has the bandages selected.
+    private bool HasBandagesSelected()
+    {
+        return selectedItem == bandages;
     }
 
     // Checks to see if keys 1-4 have been pressed to trigger item change.
@@ -100,22 +110,31 @@ public class Player : MonoBehaviour
     }
 
     // Checks if the fire button (left click) has been pressed or is being held.
-    private void CheckForWeaponFire()
+    private void CheckForItemUsage()
     {
-        if(Input.GetButtonDown("Fire1") || Input.GetMouseButton(0))
+        if (Input.GetButtonDown("Fire1") || Input.GetMouseButton(0))
         {
-            Weapon weapon = selectedItem.GetComponent<Weapon>();
-            if (timeElapsed >= weapon.fireRate)
+            if (HasWeaponSelected())
             {
-                FireWeapon(weapon);
-                timeElapsed = 0.0f;
+                Weapon weapon = selectedItem.GetComponent<Weapon>();
+                if (timeElapsed >= weapon.fireRate)
+                {
+                    FireWeapon(weapon);
+                    timeElapsed = 0.0f;
+                }
+            }
+            else if (HasBandagesSelected() && playerHealth < playerMaximumHealth)
+            {
+                Bandage bandage = selectedItem.GetComponent<Bandage>();
+                StartCoroutine(UseBandage(bandage));
             }
         }
     }
 
+    // Checks if the player has pressed the reload key (R)
     private void CheckForReload()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R) && HasWeaponSelected())
         {
             StartCoroutine(ReloadWeapon(selectedItem.GetComponent<Weapon>()));
         }
@@ -138,31 +157,26 @@ public class Player : MonoBehaviour
             // Check if anything was hit within the weapons range
             if (Physics.Raycast(playerPOV.transform.position, playerPOV.transform.forward, out hit, weapon.weaponRange))
             {
+                switch (hit.transform.tag) {
 
-                // If we hit a light bulb then destroy it. (turn off light and play sound)
-                if (hit.transform.name.ToLower().Contains("lightbulb"))
-                {
-                    hit.transform.GetComponent<AudioSource>().Play();
-                    hit.transform.GetComponentInChildren<Light>().enabled = false;
-                }
-                else if (hit.transform.CompareTag("EnemyHead"))
-                {
-                    EnemyHealth enemyHealth = hit.transform.GetComponentInParent<EnemyHealth>();
-                    enemyHealth.takeDamage(enemyHealth.getMaxHealth());
-                }
-                else if(hit.transform.CompareTag("EnemyBody"))
-                {
-                    hit.transform.GetComponent<EnemyHealth>().takeDamage(weapon.weaponDamage);
-                }
-                else
-                {       
-                    // Applies bullet holes if walls or buildings are hit.
-                    Instantiate(weapon.bulletHole, hit.point, Quaternion.FromToRotation(Vector3.back, hit.normal));            
-                }
+                    case "LightBulb":
+                        hit.transform.GetComponent<AudioSource>().Play();
+                        hit.transform.GetComponentInChildren<Light>().enabled = false;
+                        break;
 
-                // TODO: If an enemy is hit then see if it was a head or body shot and apply damage.
-                // Headshot is a kill on a basic enemy so add enemy total health to weapon damage
-                // Body shot just applies the weapons damage.
+                    case "EnemyHead":
+                        EnemyHealth enemyHealth = hit.transform.GetComponentInParent<EnemyHealth>();
+                        enemyHealth.takeDamage(enemyHealth.getMaxHealth());
+                        break;
+
+                    case "EnemyBody":
+                        hit.transform.GetComponent<EnemyHealth>().takeDamage(weapon.weaponDamage);
+                        break;
+
+                    default:
+                        Instantiate(weapon.bulletHole, hit.point, Quaternion.FromToRotation(Vector3.back, hit.normal));
+                        break;
+                }
             }
         }
         else
@@ -195,6 +209,30 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Uses a bandage if the player chooses to do so
+    private IEnumerator UseBandage(Bandage bandage)
+    {
+        if (bandage.HasBandages())
+        {
+            // Break if player is already bandaging
+            if (isBandaging)
+            {
+                yield break;
+            }
+
+            isBandaging = true;
+            PlaySound(bandage.useBandageSound);
+            yield return new WaitForSeconds(bandage.timeToBandage);
+            bandage.UseBandage();
+            playerHealth = playerHealth + bandage.bandageHealAmount > playerMaximumHealth ? playerMaximumHealth : playerHealth += bandage.bandageHealAmount;
+            isBandaging = false;
+        }
+        else
+        {
+            // No bandages left.
+        }
+    }
+
     // Plays a sound associated with a weapon
     private void PlaySound(AudioClip soundClip)
     {
@@ -205,7 +243,7 @@ public class Player : MonoBehaviour
     // Hides all items other than secondary weapon.
     private void HideItems()
     {
-        GameObject[] items = { primaryWeapon, bandages, explosives };
+        GameObject[] items = { secondaryWeapon, bandages, explosives };
 
         // Loop over each item to hide.
         foreach(var item in items)
@@ -227,6 +265,7 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Sets the selected item.
     private void SetSelectedItem(GameObject item)
     {
         if (selectedItem)

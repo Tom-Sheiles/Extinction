@@ -31,7 +31,7 @@ public class Wander : State
         if (infected.waypoints.Length > 0)
         {
             float distanceToWaypoint = Vector3.Distance(stateContext.transform.position, infected.waypoints[waypointTarget].position);
-            Debug.Log(distanceToWaypoint);
+            //Debug.Log(distanceToWaypoint);
             if (distanceToWaypoint <= infected.waypointStopDistance)
             {
                 getNextWaypoint();
@@ -57,7 +57,7 @@ public class Wander : State
            
             seenTimer += (seenIncrease * seenMultiplier);
 
-            Debug.Log("Seen timer: " + seenTimer + " increasing at " + seenIncrease + " per second");
+            //Debug.Log("Seen timer: " + seenTimer + " increasing at " + seenIncrease + " per second");
 
             // if the enemy has seen the player for enough time
             if(seenTimer >= infected.noticeTime)
