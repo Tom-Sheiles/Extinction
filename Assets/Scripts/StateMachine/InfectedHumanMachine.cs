@@ -180,7 +180,14 @@ public class MeleeAttack : State
 
         if(attackCooldown <= 0)
         {
-            playerTransform.GetComponent<PlayerHealth>().takeDamage(melee.getDamage());
+            float hitRoll = Random.Range(0.0f, 1.0f);
+            float hitChance = melee.hitChance() / 100f;
+            //Debug.Log("Roll " + hitRoll + " percent " + hitChance + " " + (hitRoll >= hitChance));
+
+            if (hitRoll >= hitChance)
+            {
+                playerTransform.GetComponent<PlayerHealth>().takeDamage(melee.getDamage());
+            }
             attackCooldown = melee.getAttackSpeed();
         }
     }
