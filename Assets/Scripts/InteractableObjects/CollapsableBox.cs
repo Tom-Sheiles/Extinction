@@ -57,7 +57,7 @@ public class CollapsableBox : MonoBehaviour
     {
         GetComponent<Animation>().Play();
         isActive = false;
-        int itemToSpawn = Random.Range(0, possibleSpawns.Length);
+        int itemToSpawn = Random.Range(0, possibleSpawns.Length - 1);
         Debug.Log(itemToSpawn);
         if (itemToSpawn > 0)
         {
