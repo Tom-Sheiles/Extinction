@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class HUD : MonoBehaviour
@@ -48,6 +49,13 @@ public class HUD : MonoBehaviour
     float healthBarCurrentWidth;
     float lastHealth;
 
+    // Any message that the player receives.
+    public Text gameMessage;
+
+    private float elapsedMessageTime = 0.0f;
+
+    private float messageTimer = 3.0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -62,7 +70,7 @@ public class HUD : MonoBehaviour
             healthBarInitialWidth = healthBar.rectTransform.rect.width;
             defaultHealthColor = healthBar.color;
             lastHealth = 100;
-        } 
+        }
         else
         {
             print("There is no player");
@@ -73,13 +81,14 @@ public class HUD : MonoBehaviour
     void Update()
     {
         timeSinceLastUpdate += Time.deltaTime;
+        elapsedMessageTime += Time.deltaTime;
 
         // Lower the update rate a bit.
         if (timeSinceLastUpdate >= updateRate)
-        {            
-            timeSinceLastUpdate = 0.0f;          
+        {
+            timeSinceLastUpdate = 0.0f;
             UpdateActiveItem(player.selectedItem.GetComponent<IPlayerItem>().GetItemName());
-            UpdateActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());  
+            UpdateActiveItemValues(player.selectedItem.GetComponent<IPlayerItem>());
 
             float currentHealth = playerHealth.getCurrentHealth();
             float maxHealth = playerHealth.getMaxHealth();
@@ -91,12 +100,12 @@ public class HUD : MonoBehaviour
             healthBar.rectTransform.sizeDelta = new Vector2(healthBarCurrentWidth, healthBar.rectTransform.rect.height);
 
             // If damage has been take since last update
-            if(currentHealth < lastHealth)
+            if (currentHealth < lastHealth)
             {
                 healthFlash.fadeIn();
             }
 
-            if(currentHealth <= (maxHealth/2))
+            if (currentHealth <= (maxHealth / 2))
             {
                 healthBar.color = lowHealthColor;
             }
@@ -107,14 +116,14 @@ public class HUD : MonoBehaviour
 
             lastHealth = currentHealth;
 
-        }        
+        }
     }
 
 
     // Updates the border around the items to indicate which one is selected.
     public void UpdateActiveItem(string selectedItem)
     {
-        foreach(HUDItem item in playerItems)
+        foreach (HUDItem item in playerItems)
         {
             // Get the image component of the HUD items parent.
             Image parentImage = item.GetComponentInParent<Image>();
@@ -143,5 +152,25 @@ public class HUD : MonoBehaviour
     {
         RectTransform crosshairDimensions = crosshair.GetComponent<RectTransform>();
         crosshairDimensions.sizeDelta = new Vector2(crosshairWidth, crosshairHeight);
+    }
+
+    // Displays a message to the player
+    public void DisplayMessage(string message)
+    {
+        if (gameMessage.text != message || elapsedMessageTime >= messageTimer) 
+        { 
+            gameMessage.text = message;
+            gameMessage.color = Color.Lerp(new Color(255, 255, 255, 1), new Color(255, 255, 255, 0), .25f);
+            StartCoroutine("RemoveMessage");
+        }
+    }
+
+    // Removes a displayed message after 3 seconds.
+    private IEnumerator RemoveMessage()
+    {
+        gameMessage.color = Color.Lerp(new Color(255, 255, 255, 0), new Color(255, 255, 255, 1), 3.0f);
+        yield return new WaitForSeconds(3);
+        gameMessage.text = "";
+        elapsedMessageTime = 0.0f;
     }
 }
