@@ -42,8 +42,8 @@ public class CollapsableBox : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, interactableRange);
+//        Gizmos.color = Color.red;
+  //      Gizmos.DrawWireSphere(transform.position, interactableRange);
     }
 
     // Listens out for other objects calling this method.

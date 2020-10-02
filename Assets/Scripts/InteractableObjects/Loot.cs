@@ -46,7 +46,7 @@ public class Loot : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(transform.position, 2);
+        //Gizmos.DrawWireSphere(transform.position, 2);
     }
 
     // Destroy the item when picked up.
