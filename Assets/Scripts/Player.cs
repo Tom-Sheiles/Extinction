@@ -31,11 +31,8 @@ public class Player : MonoBehaviour
     // Additive time since the last frame completion 
     private float timeElapsed = 0.0f;
 
-    // Flag indicating if reloading is happening
-    private bool isReloading = false;
-
-    // Flag indicating if the player is using a banadge
-    private bool isBandaging = false;
+    // Flag indicating if the player is performing any action (reloading, bandaging, planting bomb)
+    private bool isPerformingAction = false;
 
     // Start is called before the first frame update
     void Start()
@@ -55,7 +52,7 @@ public class Player : MonoBehaviour
         // Set player POV camera ot the camera that is attached to the FirstPersonCharacter.
         playerPOV = GetComponentInChildren<Camera>();
 
-        if (!isReloading || !isBandaging)
+        if (!isPerformingAction)
         {
             // See if the player has changed items.
             CheckForItemChange();
@@ -111,8 +108,15 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            item = explosives;
-        }
+            if (explosives)
+            {
+                item = explosives;
+            }
+            else
+            {
+                GameObject.FindGameObjectWithTag("HUD").SendMessage("DisplayMessage", "You have already used your explosives");
+            }
+        } 
 
         if (item)
         {
@@ -125,19 +129,25 @@ public class Player : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire1") || Input.GetMouseButton(0))
         {
-            if (HasWeaponSelected())
+            var selectedItemName = selectedItem.GetComponent<IPlayerItem>().GetItemName();
+            switch (selectedItemName)
             {
-                Weapon weapon = selectedItem.GetComponent<Weapon>();
-                if (timeElapsed >= weapon.fireRate)
-                {
-                    FireWeapon(weapon);
-                    timeElapsed = 0.0f;
-                }
-            }
-            else if (HasBandagesSelected())
-            {
-                Bandage bandage = selectedItem.GetComponent<Bandage>();
-                StartCoroutine(UseBandage(bandage));
+                case "bandages":
+                    StartCoroutine(UseBandage(selectedItem.GetComponent<Bandage>()));
+                    break;
+
+                case "explosive":
+                    StartCoroutine(PlantExplosive(selectedItem.GetComponent<Explosive>()));
+                    break;
+
+                default:
+                    Weapon weapon = selectedItem.GetComponent<Weapon>();
+                    if (timeElapsed >= weapon.fireRate)
+                    {
+                        FireWeapon(weapon);
+                        timeElapsed = 0.0f;
+                    }
+                    break;
             }
         }
     }
@@ -216,17 +226,17 @@ public class Player : MonoBehaviour
         if (weapon.CanReload())
         {
             // If already reloading then discontinue
-            if (isReloading)
+            if (isPerformingAction)
             {
                 yield break;
             }
 
             // Weapon is now reloading, wait for the reload time and then reload.
-            isReloading = true;
+            isPerformingAction = true;
             PlaySound(weapon.reloadSound);
             yield return new WaitForSeconds(weapon.reloadTime);
             weapon.Reload();
-            isReloading = false;            
+            isPerformingAction = false;            
         }
         else
         {
@@ -240,17 +250,17 @@ public class Player : MonoBehaviour
         if (bandage.HasBandages() && health.getCurrentHealth() < health.getMaxHealth())
         {
             // Break if player is already bandaging
-            if (isBandaging)
+            if (isPerformingAction)
             {
                 yield break;
             }
 
-            isBandaging = true;
+            isPerformingAction = true;
             PlaySound(bandage.useBandageSound);
             yield return new WaitForSeconds(bandage.timeToBandage);
             bandage.UseBandage();
             SendMessage("heal", bandage.bandageHealAmount);
-            isBandaging = false;
+            isPerformingAction = false;
         }
         else
         {
@@ -258,7 +268,28 @@ public class Player : MonoBehaviour
         }
     }
 
-    // Plays a sound associated with a weapon
+    // Handles the player planting the explosive
+    private IEnumerator PlantExplosive(Explosive explosive)
+    {
+        if (explosive.HasExplosive() && interactableObject)
+        {
+            if (isPerformingAction)
+            {
+                yield break;
+            }
+
+            isPerformingAction = true;
+            explosive.Plant();
+            yield return new WaitForSeconds(explosive.timeToPlant);
+            interactableObject.SendMessage("PlantExplosive", selectedItem);
+            Destroy(explosives);
+            SetSelectedItem(primaryWeapon);
+            isPerformingAction = false;
+        }
+
+    }
+
+    // Plays a sound associated with an item
     private void PlaySound(AudioClip soundClip)
     {
         AudioSource audio = selectedItem.GetComponent<AudioSource>();
@@ -284,9 +315,14 @@ public class Player : MonoBehaviour
     private void SetItemVisibility(GameObject item, bool visibility)
     {
         // Get each MeshRenderer in the item and hide them.
-        foreach (var itemMeshRenderer in item.GetComponentsInChildren<MeshRenderer>())
+        var itemRenderers = item.GetComponentsInChildren<Renderer>();
+        if (itemRenderers.Length > 0)
         {
-            itemMeshRenderer.enabled = visibility;
+
+            foreach (var itemMeshRenderer in itemRenderers)
+            {
+                itemMeshRenderer.enabled = visibility;
+            }
         }
     }
 

@@ -56,6 +56,9 @@ public class HUD : MonoBehaviour
 
     private float messageTimer = 3.0f;
 
+    // Detonation
+    public Text detonationTimer;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -129,6 +132,7 @@ public class HUD : MonoBehaviour
             Image parentImage = item.GetComponentInParent<Image>();
 
             // If the item name is equal to the selected item then change the sprite around the item.
+            Debug.Log($"item name: {item.itemName}, selectedItem: {selectedItem}");
             if (item.itemName == selectedItem)
             {
                 parentImage.sprite = selectedItemSprite;
@@ -158,11 +162,18 @@ public class HUD : MonoBehaviour
     public void DisplayMessage(string message)
     {
         if (gameMessage.text != message || elapsedMessageTime >= messageTimer) 
-        { 
+        {
+            elapsedMessageTime = 0.0f;
             gameMessage.text = message;
             gameMessage.color = Color.Lerp(new Color(255, 255, 255, 1), new Color(255, 255, 255, 0), .25f);
             StartCoroutine("RemoveMessage");
         }
+    }
+
+    // Updates the detontation timer
+    public void UpdateDetonationTimer(int timeTilDetonation)
+    {
+        detonationTimer.text = timeTilDetonation > 0 ? $"Bomb Detonation In: {timeTilDetonation}" : "";
     }
 
     // Removes a displayed message after 3 seconds.
@@ -171,6 +182,5 @@ public class HUD : MonoBehaviour
         gameMessage.color = Color.Lerp(new Color(255, 255, 255, 0), new Color(255, 255, 255, 1), 3.0f);
         yield return new WaitForSeconds(3);
         gameMessage.text = "";
-        elapsedMessageTime = 0.0f;
     }
 }

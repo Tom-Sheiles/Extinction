@@ -3,7 +3,7 @@
 public class Bandage : MonoBehaviour, IPlayerItem
 {
     // The name of the item
-    public string itemName = "Bandage";
+    public string itemName = "bandage";
 
     // Maximum number of bandages that the player can hold
     public int maximumNumberOfBandages = 5;
