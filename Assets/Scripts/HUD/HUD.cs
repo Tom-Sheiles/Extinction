@@ -49,6 +49,11 @@ public class HUD : MonoBehaviour
     float healthBarCurrentWidth;
     float lastHealth;
 
+    // Overall HUD OBject
+    public GameObject HUDObject;
+    public GameObject deathEffects;
+    public bool HUDActive = true;
+
     // Any message that the player receives.
     public Text gameMessage;
 
@@ -116,6 +121,12 @@ public class HUD : MonoBehaviour
 
             lastHealth = currentHealth;
 
+            if(playerHealth.getCurrentHealth() <= 0)
+            {
+                HUDActive = false;
+                deathEffects.SetActive(true);
+                HUDObject.SetActive(false);
+            }
         }
     }
 
