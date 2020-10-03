@@ -8,7 +8,8 @@ public class MainMenu : MonoBehaviour
     // Loads a level with the given levelName
     public void LoadLevel(string levelName)
     {
-        SceneManager.LoadScene(levelName);
+        //SceneManager.LoadScene(levelName);
+        LoadManager.loadLevel(levelName);
     }
 
     // Quits the game.

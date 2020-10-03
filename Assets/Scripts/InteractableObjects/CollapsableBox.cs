@@ -13,17 +13,18 @@ public class CollapsableBox : MonoBehaviour
 
     // Reference to the HUD to send messages.
     public GameObject HUD;
+    private HUD hud;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        hud = HUD.GetComponent<HUD>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isActive)
+        if (isActive && hud.HUDActive)
         {
             var objectsInRange = Physics.OverlapSphere(transform.position, interactableRange);
             foreach (var obj in objectsInRange)
