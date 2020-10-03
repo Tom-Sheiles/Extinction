@@ -22,7 +22,7 @@ public class Bandage : MonoBehaviour, IPlayerItem
     // Expends a bandage
     public void UseBandage()
     {
-       numberOfBandages--;
+        numberOfBandages--;
     }
 
     public bool HasBandages()
@@ -39,6 +39,11 @@ public class Bandage : MonoBehaviour, IPlayerItem
     public string GetItemName()
     {
         return itemName;
+    }
+
+    public void Add(int amount)
+    {
+        numberOfBandages = numberOfBandages + amount > maximumNumberOfBandages ? maximumNumberOfBandages : numberOfBandages + amount;
     }
 
     public AudioClip GetItemSound()

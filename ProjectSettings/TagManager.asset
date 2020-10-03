@@ -7,6 +7,8 @@ TagManager:
   - EnemyHead
   - EnemyBody
   - LightBulb
+  - LootBox
+  - HUD
   layers:
   - Default
   - TransparentFX

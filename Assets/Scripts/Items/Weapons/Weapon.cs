@@ -60,6 +60,7 @@ public class Weapon : MonoBehaviour, IPlayerItem
         ammunitionInReserve = ammunitionInReserve - spaceInMagazine >= 0 ? ammunitionInReserve - spaceInMagazine : 0;
     }
 
+    #region IPlayerItem Interface Methods
     public string GetItemName()
     {
         return weaponType;
@@ -75,6 +76,11 @@ public class Weapon : MonoBehaviour, IPlayerItem
         return ammunitionInMagazine;
     }
 
+    public void Add(int amount)
+    {
+        ammunitionInReserve = ammunitionInReserve + amount > maximumAmmunition ? maximumAmmunition : ammunitionInReserve + amount;
+    }
+
     public AudioClip GetItemSound()
     {
         return fireSound;
@@ -84,4 +90,5 @@ public class Weapon : MonoBehaviour, IPlayerItem
     {
         return fireSound != null;
     }
+    #endregion
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -18,7 +19,11 @@ public class Player : MonoBehaviour
     // Explosives to destroy lab
     public GameObject explosives;
 
+    // The currently select item
     public GameObject selectedItem;
+
+    // Reference for any interactable objects that the player encounters
+    public GameObject interactableObject;
 
     // Position where weapon fire originate from
     public Camera playerPOV;
@@ -60,7 +65,16 @@ public class Player : MonoBehaviour
 
             // See if the player has hit the reload button.
             CheckForReload();
+            
+            // See if the player has interacted with something
+            CheckForInteraction();
         }
+    }
+
+    // When an interactable item is found then set it.
+    public void InteractableFound(GameObject interactableItem)
+    {
+        interactableObject = interactableItem;
     }
 
     // Checks to see if a weapon is selected.
@@ -134,6 +148,20 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R) && HasWeaponSelected())
         {
             StartCoroutine(ReloadWeapon(selectedItem.GetComponent<Weapon>()));
+        }
+    }
+
+    // Check if the player has interacted with something.
+    private void CheckForInteraction()
+    {
+        if (Input.GetKeyDown(KeyCode.E) && interactableObject)
+        {
+            if (interactableObject.GetComponent<Loot>())
+            {
+                PickedUpLoot(interactableObject.GetComponent<Loot>());
+            }
+            interactableObject.SendMessage("Interact");
+            interactableObject = null;
         }
     }
 
@@ -272,5 +300,34 @@ public class Player : MonoBehaviour
         }
 
         selectedItem = item;
+    }
+
+    // Handles the picking up of loot.
+    private void PickedUpLoot(Loot loot)
+    {
+        GameObject lootForItem = null;
+
+        switch(loot.lootType)
+        {
+            case LootType.AR:
+                lootForItem = primaryWeapon;
+                break;
+
+            case LootType.PISTOL:
+                lootForItem = secondaryWeapon;
+                break;
+
+            case LootType.BANDAGE:
+                lootForItem = bandages;
+                break;
+
+            default:
+                break;
+        }
+
+        if (lootForItem)
+        {
+            lootForItem.GetComponent<IPlayerItem>().Add(loot.amount);
+        }
     }
 }
