@@ -1,4 +1,4 @@
-﻿using System.Security.Policy;
+﻿//using System.Security.Policy;
 using UnityEngine;
 
 public class Loot : MonoBehaviour

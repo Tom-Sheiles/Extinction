@@ -61,6 +61,7 @@ public class PlayerCameraControl : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         firstPersonPosition.position = playerCamera.transform.position;
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
 
