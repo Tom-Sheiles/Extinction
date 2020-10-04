@@ -1,5 +1,8 @@
-﻿using System.Collections;
+﻿using Boo.Lang;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HUD : MonoBehaviour
@@ -61,8 +64,11 @@ public class HUD : MonoBehaviour
 
     private float messageTimer = 3.0f;
 
-    // Detonation
+    // Detonation timer
     public Text detonationTimer;
+
+    // The current objective of the player
+    public Text currentObjective;
 
     // Start is called before the first frame update
     void Start()
@@ -193,5 +199,14 @@ public class HUD : MonoBehaviour
         gameMessage.color = Color.Lerp(new Color(255, 255, 255, 0), new Color(255, 255, 255, 1), 3.0f);
         yield return new WaitForSeconds(3);
         gameMessage.text = "";
+    }
+
+    // Sets the current objective if it has changed
+    private void UpdateCurrentObjective(string objective)
+    {
+        if (currentObjective.text != objective)
+        {
+            currentObjective.text = $"- {objective}";
+        }
     }
 }
