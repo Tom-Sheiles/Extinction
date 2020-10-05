@@ -32,6 +32,8 @@ public class LevelComplete : MonoBehaviour
 
     public void Continue()
     {
+        // Reset the score object
+        score.ResetScore();
         // Would get the next level here if there was one
         SceneManager.LoadScene("Menu");
     }
