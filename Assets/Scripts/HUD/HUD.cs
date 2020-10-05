@@ -96,6 +96,12 @@ public class HUD : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!deathEffects)
+        {
+            deathEffects = GameObject.FindGameObjectWithTag("DeathEffect");
+            Debug.Log(GameObject.FindGameObjectWithTag("DeathEffect"));
+        }
+
         timeSinceLastUpdate += Time.deltaTime;
         elapsedMessageTime += Time.deltaTime;
 

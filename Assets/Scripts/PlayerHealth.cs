@@ -26,7 +26,11 @@ public class PlayerHealth : MonoBehaviour
     private void Update()
     {
         if (!isDead) return;
-        if (Input.GetKeyDown(KeyCode.R)) LoadManager.loadLevel(SceneManager.GetActiveScene().name);
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            LoadManager.loadLevel(SceneManager.GetActiveScene().name);
+            GameObject.FindGameObjectWithTag("Score").SendMessage("ResetScore");
+        }
     }
 
     public void takeDamage(float amount)
