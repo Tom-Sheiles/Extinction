@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 0}
+  m_Color: {r: 0.99607843, g: 0, b: 0, a: 0}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -1397,6 +1397,12 @@ MonoBehaviour:
     type: 3}
   lowHealthColor: {r: 1, g: 0, b: 0, a: 1}
   healthFlash: {fileID: 1510987463}
+  HUDObject: {fileID: 0}
+  deathEffects: {fileID: 0}
+  HUDActive: 1
+  gameMessage: {fileID: 0}
+  detonationTimer: {fileID: 0}
+  currentObjective: {fileID: 0}
 --- !u!1 &1370178986410458166
 GameObject:
   m_ObjectHideFlags: 0
