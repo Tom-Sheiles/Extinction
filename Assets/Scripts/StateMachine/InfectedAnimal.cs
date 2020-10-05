@@ -27,7 +27,6 @@ public class InfectedAnimal : MonoBehaviour, IMelee
     private void Start()
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
-        Debug.Log(playerTransform);
 
         stateMachine = GetComponent<FiniteStateMachine>();
         stateMachine.StartStateMachine();

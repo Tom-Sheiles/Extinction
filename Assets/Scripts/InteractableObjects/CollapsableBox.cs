@@ -63,5 +63,8 @@ public class CollapsableBox : MonoBehaviour
         {
             Instantiate(possibleSpawns[itemToSpawn], transform.position, transform.rotation);
         }
+
+        // Update loot score.
+        GameObject.FindGameObjectWithTag("Score").GetComponent<Score>().SendMessage("FoundLoot");
     }
 }

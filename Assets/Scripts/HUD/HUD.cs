@@ -64,6 +64,8 @@ public class HUD : MonoBehaviour
     // Detonation
     public Text detonationTimer;
 
+    public Text scoreText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -130,6 +132,8 @@ public class HUD : MonoBehaviour
                 deathEffects.SetActive(true);
                 HUDObject.SetActive(false);
             }
+
+            UpdateScore();
         }
     }
 
@@ -143,7 +147,6 @@ public class HUD : MonoBehaviour
             Image parentImage = item.GetComponentInParent<Image>();
 
             // If the item name is equal to the selected item then change the sprite around the item.
-            Debug.Log($"item name: {item.itemName}, selectedItem: {selectedItem}");
             if (item.itemName == selectedItem)
             {
                 parentImage.sprite = selectedItemSprite;
@@ -193,5 +196,10 @@ public class HUD : MonoBehaviour
         gameMessage.color = Color.Lerp(new Color(255, 255, 255, 0), new Color(255, 255, 255, 1), 3.0f);
         yield return new WaitForSeconds(3);
         gameMessage.text = "";
+    }
+
+    private void UpdateScore()
+    {
+        scoreText.text = $"Score: {GameObject.FindGameObjectWithTag("Score").GetComponent<Score>().GetOverallScore()}";
     }
 }

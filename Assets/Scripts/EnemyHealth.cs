@@ -9,6 +9,8 @@ public class EnemyHealth : MonoBehaviour
     private float currentHealth;
     private FiniteStateMachine stateMachine;
 
+    private bool headShot = false;
+
     private void Start()
     {
         stateMachine = GetComponent<FiniteStateMachine>();
@@ -18,6 +20,7 @@ public class EnemyHealth : MonoBehaviour
     public void takeDamage(float amount)
     {
         currentHealth -= amount;
+        headShot = amount >= maxHealth;
         //stateMachine.setCurrentState(new Chase());
         checkHealth();
     }
@@ -26,6 +29,7 @@ public class EnemyHealth : MonoBehaviour
     {
         if(currentHealth <= 0)
         {
+            GameObject.FindGameObjectWithTag("Score").SendMessage("KilledEnemy", headShot);
             stateMachine.setCurrentState(new Dead());
         }
     }
