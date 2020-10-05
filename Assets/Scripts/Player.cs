@@ -1,6 +1,6 @@
 ﻿using System.Collections;
-using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -34,9 +34,14 @@ public class Player : MonoBehaviour
     // Flag indicating if the player is performing any action (reloading, bandaging, planting bomb)
     private bool isPerformingAction = false;
 
+    private Objective[] objectives;
+
     // Start is called before the first frame update
     void Start()
-    {        
+    {
+        // Get the objectives for the level
+        objectives = MissionObjectives.GetMissionObjectives(SceneManager.GetActiveScene().name);
+
         // Hide all items other than selected.
         HideItems();
 
@@ -51,6 +56,8 @@ public class Player : MonoBehaviour
 
         // Set player POV camera ot the camera that is attached to the FirstPersonCharacter.
         playerPOV = GetComponentInChildren<Camera>();
+
+        CheckCurrentMissionObjective();
 
         if (!isPerformingAction)
         {
@@ -72,6 +79,30 @@ public class Player : MonoBehaviour
     public void InteractableFound(GameObject interactableItem)
     {
         interactableObject = interactableItem;
+    }
+
+    // Complete an objective if it is the current objective
+    public void CompleteObjective(int objectiveNumber)
+    {
+        var objective = objectives[objectiveNumber - 1];
+        var isCurrentObjective = objectiveNumber < 2 || objectives[objectiveNumber - 2].IsCompleted();
+        if (isCurrentObjective && !objective.IsCompleted())
+        {
+            objectives[objectiveNumber - 1].Complete();
+        }
+    }
+
+    // Checks what the current mission objective is
+    private void CheckCurrentMissionObjective()
+    {
+        foreach (var objective in objectives)
+        {
+            if (!objective.IsCompleted())
+            {
+                GameObject.FindGameObjectWithTag("HUD").SendMessage("UpdateCurrentObjective", objective.GetObjective());
+                break;
+            }
+        }
     }
 
     // Checks to see if a weapon is selected.
