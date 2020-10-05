@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LevelComplete : MonoBehaviour
@@ -22,11 +23,17 @@ public class LevelComplete : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        score = GameObject.FindGameObjectWithTag("Score").GetComponent<Score>();
-        if (score)
+        if(GameObject.FindGameObjectWithTag("Score").GetComponent<Score>())
         {
+            score = GameObject.FindGameObjectWithTag("Score").GetComponent<Score>();
             SetScores();
         }
+    }
+
+    public void Continue()
+    {
+        // Would get the next level here if there was one
+        SceneManager.LoadScene("Menu");
     }
 
     // Sets the information for the level completed screen
