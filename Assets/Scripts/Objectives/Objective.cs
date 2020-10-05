@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Objective : MonoBehaviour
+public class Objective
 {
     private string objective;
 

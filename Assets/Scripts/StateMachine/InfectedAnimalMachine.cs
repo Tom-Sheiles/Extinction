@@ -35,24 +35,29 @@ public class AnimalWander : State
 
     public override bool checkStateSwitch()
     {
-        float distance = Vector3.Distance(stateContext.transform.position, playerTransform.position);
+        var shouldChase = false;
 
-        if(distance <= animal.noticeRange)
+        if (playerTransform)
         {
-            animal.visionIndicator.SetActive(true);
-        }
-        else
-        {
-            animal.visionIndicator.SetActive(false);
+            float distance = Vector3.Distance(stateContext.transform.position, playerTransform.position);
+
+            if (distance <= animal.noticeRange)
+            {
+                animal.visionIndicator.SetActive(true);
+            }
+            else
+            {
+                animal.visionIndicator.SetActive(false);
+            }
+
+            if (distance <= animal.chaseDistance)
+            {
+                nextState = new Chase();
+                shouldChase = true;
+            }
         }
 
-        if(distance <= animal.chaseDistance)
-        {
-            nextState = new Chase();
-            return true;
-        }
-
-        return false;
+        return shouldChase;
     }
 
     private void getNextWaypoint()

@@ -8,7 +8,7 @@ public class Checkpoint : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
-        if (other.name == "Player")
+        if (other.CompareTag("Player"))
         {
             other.SendMessage("CompleteObjective", checkpointNumber);
         }

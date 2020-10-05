@@ -38,7 +38,6 @@ public class Boss : MonoBehaviour, IMelee
 
         if(health.getCurrentHealth() <= health.getMaxHealth()/2)
         {
-            Debug.Log("Enraged");
             enraged = true;
             attackDamage *= 2;
             attackSpeed *= 2;
