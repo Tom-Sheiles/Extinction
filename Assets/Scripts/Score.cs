@@ -51,7 +51,7 @@ public class Score : MonoBehaviour
     // Total number of objectives in the level
     private int totalObjectives = 0;
 
-    public void Awake()
+    private void Awake()
     {
         DontDestroyOnLoad(gameObject);
     }

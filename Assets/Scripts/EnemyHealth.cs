@@ -29,8 +29,8 @@ public class EnemyHealth : MonoBehaviour
     {
         if(currentHealth <= 0)
         {
-            GameObject.FindGameObjectWithTag("Score").SendMessage("KilledEnemy", headShot);
             stateMachine.setCurrentState(new Dead());
+            GameObject.FindGameObjectWithTag("Score").SendMessage("KilledEnemy", headShot);
         }
     }
 

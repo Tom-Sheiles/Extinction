@@ -11,20 +11,16 @@ public class CollapsableBox : MonoBehaviour
     // Flag indicating whether the object is interacable.
     public bool isActive = true;
 
-    // Reference to the HUD to send messages.
-    public GameObject HUD;
-    private HUD hud;
-
     // Start is called before the first frame update
     void Start()
     {
-        hud = HUD.GetComponent<HUD>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isActive && hud.HUDActive)
+        if (isActive)
         {
             var objectsInRange = Physics.OverlapSphere(transform.position, interactableRange);
             foreach (var obj in objectsInRange)
@@ -35,7 +31,7 @@ public class CollapsableBox : MonoBehaviour
                     obj.SendMessage("InteractableFound", gameObject);
 
                     // Tell the player that they can open the box.
-                    HUD.SendMessage("DisplayMessage", "Press 'E' to open box");
+                    GameObject.FindGameObjectWithTag("HUD").SendMessage("DisplayMessage", "Press 'E' to open box");
                 }
             }
         }
@@ -64,7 +60,7 @@ public class CollapsableBox : MonoBehaviour
             Instantiate(possibleSpawns[itemToSpawn], transform.position, transform.rotation);
         }
 
-        // Update loot score.
+        // Update loot score
         GameObject.FindGameObjectWithTag("Score").GetComponent<Score>().SendMessage("FoundLoot");
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -35,15 +36,18 @@ public class Player : MonoBehaviour
     private bool isPerformingAction = false;
 
     private Objective[] objectives;
-    
-    // Flag to see if a player has met the requirements to be extracted
-    private bool canBeExtracted = true;
+
+    private bool canBeExtracted = false;
+
+    private bool labDestroyed = false;
 
     // Start is called before the first frame update
     void Start()
     {
         // Get the objectives for the level
-        objectives = MissionObjectives.GetMissionObjectives(SceneManager.GetActiveScene().name);
+        objectives = MissionObjectives.GetMissionObjectives("Level01_GriffithUniversity");
+
+        GameObject.FindGameObjectWithTag("Score").SendMessage("SetTotalObjectives", objectives.Length);
 
         // Hide all items other than selected.
         HideItems();
@@ -92,7 +96,23 @@ public class Player : MonoBehaviour
         if (isCurrentObjective && !objective.IsCompleted())
         {
             objectives[objectiveNumber - 1].Complete();
+            GameObject.FindGameObjectWithTag("Score").SendMessage("CompletedObjective", objectiveNumber);
         }
+    }
+
+    public bool CanBeExtracted()
+    {
+        return canBeExtracted;
+    }
+
+    public bool HasDestroyedLab()
+    {
+        return labDestroyed;
+    }
+
+    public void LabDestroyed()
+    {
+        labDestroyed = canBeExtracted = true;
     }
 
     // Checks what the current mission objective is
@@ -106,11 +126,6 @@ public class Player : MonoBehaviour
                 break;
             }
         }
-    }
-    
-    public bool CanBeExtracted()
-    {
-        return canBeExtracted;
     }
 
     // Checks to see if a weapon is selected.

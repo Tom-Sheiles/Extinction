@@ -10,6 +10,7 @@ TagManager:
   - LootBox
   - HUD
   - Score
+  - LabEntrance
   layers:
   - Default
   - TransparentFX

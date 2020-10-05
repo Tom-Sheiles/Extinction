@@ -69,6 +69,7 @@ public class HUD : MonoBehaviour
 
     // The current objective of the player
     public Text currentObjective;
+
     public Text scoreText;
 
     // Start is called before the first frame update
@@ -211,7 +212,7 @@ public class HUD : MonoBehaviour
             currentObjective.text = $"- {objective}";
         }
     }
-    
+
     private void UpdateScore()
     {
         scoreText.text = $"Score: {GameObject.FindGameObjectWithTag("Score").GetComponent<Score>().GetOverallScore()}";
