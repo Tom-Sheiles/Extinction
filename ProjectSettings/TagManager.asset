@@ -9,6 +9,7 @@ TagManager:
   - LightBulb
   - LootBox
   - HUD
+  - Score
   layers:
   - Default
   - TransparentFX

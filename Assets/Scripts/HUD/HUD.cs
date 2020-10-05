@@ -69,6 +69,7 @@ public class HUD : MonoBehaviour
 
     // The current objective of the player
     public Text currentObjective;
+    public Text scoreText;
 
     // Start is called before the first frame update
     void Start()
@@ -136,6 +137,8 @@ public class HUD : MonoBehaviour
                 deathEffects.SetActive(true);
                 HUDObject.SetActive(false);
             }
+
+            UpdateScore();
         }
     }
 
@@ -149,7 +152,6 @@ public class HUD : MonoBehaviour
             Image parentImage = item.GetComponentInParent<Image>();
 
             // If the item name is equal to the selected item then change the sprite around the item.
-            Debug.Log($"item name: {item.itemName}, selectedItem: {selectedItem}");
             if (item.itemName == selectedItem)
             {
                 parentImage.sprite = selectedItemSprite;
@@ -208,5 +210,10 @@ public class HUD : MonoBehaviour
         {
             currentObjective.text = $"- {objective}";
         }
+    }
+    
+    private void UpdateScore()
+    {
+        scoreText.text = $"Score: {GameObject.FindGameObjectWithTag("Score").GetComponent<Score>().GetOverallScore()}";
     }
 }

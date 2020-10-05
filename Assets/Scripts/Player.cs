@@ -35,6 +35,9 @@ public class Player : MonoBehaviour
     private bool isPerformingAction = false;
 
     private Objective[] objectives;
+    
+    // Flag to see if a player has met the requirements to be extracted
+    private bool canBeExtracted = true;
 
     // Start is called before the first frame update
     void Start()
@@ -104,6 +107,11 @@ public class Player : MonoBehaviour
             }
         }
     }
+    
+    public bool CanBeExtracted()
+    {
+        return canBeExtracted;
+    }
 
     // Checks to see if a weapon is selected.
     private bool HasWeaponSelected()
@@ -163,7 +171,7 @@ public class Player : MonoBehaviour
             var selectedItemName = selectedItem.GetComponent<IPlayerItem>().GetItemName();
             switch (selectedItemName)
             {
-                case "bandages":
+                case "bandage":
                     StartCoroutine(UseBandage(selectedItem.GetComponent<Bandage>()));
                     break;
 

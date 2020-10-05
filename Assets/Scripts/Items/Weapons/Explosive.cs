@@ -86,6 +86,10 @@ public class Explosive : MonoBehaviour, IPlayerItem
     {
         GetComponent<AudioSource>().PlayOneShot(detonationSound);
         StartCoroutine(CheckIfPlayerNearby());
+
+        // Update the score when the explosive is detonated
+        GameObject.FindGameObjectWithTag("Score").SendMessage("ExplosiveDetonated");
+
         Destroy(gameObject, detonationSound.length);
     }
 
@@ -137,6 +141,9 @@ public class Explosive : MonoBehaviour, IPlayerItem
     {
         yield return new WaitForSeconds(timeToPlant);
         numberOfExplosives--;
+
+        // Update the score when the explosive is planted
+        GameObject.FindGameObjectWithTag("Score").SendMessage("ExplosivePlanted");
     }
 
     // Checks if a player is nearby when the explosion goes off and deals damage based on the players range to the explosion
